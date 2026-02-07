@@ -9,11 +9,13 @@ import Navbar from './components/Navbar.jsx'
 export const serverUrl = 'http://localhost:8000'
 
 import Home from './pages/Home.jsx';
+import UseGetCurrentCity from './Hooks/UseGetCurrentCity.jsx';
 
 
 function App() {
   const userData = useSelector((state) => state.user.userData);
   useGetCuurentUser();
+  UseGetCurrentCity();
 
   return (
     <>
