@@ -1,18 +1,17 @@
 import mongoose from 'mongoose'
-
-const shopSchema =new mongoose.schema({
+import { Schema } from 'mongoose';
+const shopSchema = Schema({
       name:{
             type:String,
             required:true
       },
       image:{
             type:String,
-            required:true
+            
       },
       owner:{
             type:mongoose.Schema.Types.ObjectId,
             ref:"User",
-            required:true
       },
 
       state:{
@@ -28,9 +27,9 @@ const shopSchema =new mongoose.schema({
             required:true
       },
       items:{
-            type:mongoose.schema.Types.ObjectId,
+            type:mongoose.Schema.Types.ObjectId,
             ref:"item"
-      }
+      },
 
 },{timestamps:true})
 

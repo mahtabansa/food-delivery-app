@@ -14,6 +14,7 @@ function useGetCuurentUser() {
                         )
                     
                         dispatch(setUserData(result.data));
+                        
                   } catch(err) {
                         console.log('Error occured during get current user:', err);
                         
