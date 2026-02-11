@@ -127,9 +127,11 @@ function Navbar() {
 
                         {showInfo && <div className=' flex flex-col fixed  top-20 right-[3%]  md:right-[5%] lg:right-[20%] 
                         rounded-lg bg-white h-[50vh] w-[200px] z-[999999] shadow-lg    '>
+                              <button className='absolute black right-[10px] top-[10px]' onClick={()=>navigate(-1)}><RxCross1 className='text-orange-600 text-xl font-extrabold'></RxCross1></button>
                               <div className='w-full h-[50px] flex  items-center justify-center text-lg font-bold 
                                  text-gray-700 border-b-[1px] border-gray-400'>My Profile
                               </div>
+                        
 
                               <h1 className='p-2 truncate '>{userData ? userData.fullName : "Guest"}</h1>
                               <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold'>my order</div>

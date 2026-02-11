@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { Schema } from 'mongoose';
+
 const shopSchema = Schema({
       name:{
             type:String,
@@ -7,7 +8,7 @@ const shopSchema = Schema({
       },
       image:{
             type:String,
-            
+            required:true        
       },
       owner:{
             type:mongoose.Schema.Types.ObjectId,

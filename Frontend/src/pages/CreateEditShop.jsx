@@ -22,36 +22,52 @@ const CreateEditShop = () => {
 
 
       const handleImage = (e) => {
-            const file = e.target.files[0];
+            try {
+                  const file = e.target.files[0];
+                
+                  if (!file) return;
+                  
+                  
+                  setBackendImage(file);
 
-            if (!file) return;
-
-            setBackendImage(file);
-            setFrontendImage(URL.createObjectURL(file));
+                  setFrontendImage(URL.createObjectURL(file));
+                  console.log("BackendImage:", BackendImage);
+            } catch (err) {
+                  console.log("handle image is not working");
+            }
       };
 
+      const handleSubmit = async ( e) => {
+             
+            e.preventDefault();
+            try {
+                  const formData = new FormData();
+                  formData.append("name", name)
+                  formData.append("state", state)
+                  formData.append("city", city)
+                  formData.append("address", address)
 
+                   if(BackendImage){
+                        formData.append("image", BackendImage);
+                   }
+                  
 
-const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-            const formData = new FormData();
-            formData.append("name", name)
-            formData.append("state", state)
-            formData.append("city", city)
-            formData.append("address", address)
+                  const result = await axios.post(
+                        "http://localhost:8000/api/shop/create-edit-shop",
+                        formData,
+                        {
+                              withCredentials: true  // ✅ Sahi jagah
+                        }
 
-            if (BackendImage) {
-                  formData.append("image", BackendImage);
+                  );
+
+                  console.log("result int he create edit route", result);
+                  dispatch(setMyShopData(result.data))
+            } catch (err) {
+                  console.log("error during form form submission", err);
             }
-              
-            const result = await axios.post('http://localhost:8000/api/shop/create-edit-shop', formData, { withCredentials: true });
-            console.log("result int he create edit route",result);
-            dispatch(setMyShopData(result.data))
-      } catch (err) {
-            console.log("error during form form submission", err);
       }
-}
+
 
 return (
       <div className='min-h-screen flex justify-center items-center flex-col p-6 bg-gradient-to-br from-orange-50 relative to-white'>
@@ -71,7 +87,7 @@ return (
                         </div>
                   </div>
 
-                  <form className='space-y-5' onSubmit={handleSubmit}>
+                  <form className='space-y-5' onSubmit={handleSubmit} >
                         <div>
                               <label htmlFor="name" className='block text-sm font-medium text-gray-900 mb-2'>name</label>
                               <input type="text" placeholder='Enter Shop Name' className='w-full px-4 py-2 border rounded-lg focus:outline-none 
@@ -81,7 +97,7 @@ return (
                         <div>
                               <label htmlFor="image" className='block text-sm font-medium text-gray-900 mb-2'>Image</label>
                               <input type="file" placeholder='Upload image' className='w-full px-4 py-2 border rounded-lg focus:outline-none 
-                                    focus:ring-2 focus:ring-orange-500 '   accept="image/*" onClick={handleImage} />
+                                    focus:ring-2 focus:ring-orange-500 ' accept="image/*" onChange={handleImage} />
                         </div>
                         {FrontendImage &&
 

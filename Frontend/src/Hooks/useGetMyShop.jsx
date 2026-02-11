@@ -10,7 +10,7 @@ const useGetMyShop = () => {
    useEffect(()=> {
       
       const fetchShop = async() => {
-       try {
+      
             const result = await axios.get("http://localhost:8000/api/shop/get-my",{withCredentials:true});
             console.log("use get my shop data result",result);
              if(!result){
@@ -19,13 +19,7 @@ const useGetMyShop = () => {
              }  
              console.log(result.data)
              dispatch(setMyShopData(result.data))
-            //  return res.status(200).json(result);
-    
-      }catch(err){
-            // return res.status(500).json({message:"error while fetching shop ",err})
-            console.log(err);
-      }
-        
+            //  return res.status(200).json(result); 
       } 
     fetchShop();
       

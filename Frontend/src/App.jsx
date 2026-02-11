@@ -11,6 +11,8 @@ import UseGetCurrentCity from './Hooks/UseGetCurrentCity.jsx';
 import useGetMyShop from './Hooks/useGetMyShop.jsx';
 import CreateEditShop from './pages/CreateEditShop.jsx';
 export const serverUrl= 'http://localhost:8000'
+// "http://localhost:8000/api/shop/create-edit-shop"
+
 
 function App() {
   const userData = useSelector((state) => state.user.userData);

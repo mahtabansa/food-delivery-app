@@ -30,7 +30,7 @@ export const signUp = async (req, res) => {
     console.log("Token gen",token);
     res.cookie("token", token, {
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
@@ -63,7 +63,7 @@ export const signIn = async (req, res) => {
     console.log(token);
     res.cookie("token", token, {
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
@@ -176,7 +176,7 @@ export const googleAuth = async(req,res) => {
         const token=await gentoken(user._id);
         res.cookie("token",token,{
         secure: false,
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         });
@@ -184,4 +184,5 @@ export const googleAuth = async(req,res) => {
         return res.status(200).json(user);
 
 }
+
 
