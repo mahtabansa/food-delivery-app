@@ -1,5 +1,5 @@
 import { Shop } from "../models/shop.model.js";
-import  UploadOnCloudinary  from "../utils/cloudinary.js";
+import UploadOnCloudinary from "../utils/cloudinary.js";
 import { Item } from "../models/item.model.js";
 
 const addItem = async (req, res) => {
@@ -10,7 +10,7 @@ const addItem = async (req, res) => {
     if (req.file) {
       image = await UploadOnCloudinary(req.file.path);
     }
-    const shop = await Shop.findOne({ owner: req.userId });
+    const shop = await Shop.findOne({ owner: req.userId }).populate("items");
     if (!shop) {
       return res.status(500).json({ message: "shop not found" });
     }
@@ -22,6 +22,10 @@ const addItem = async (req, res) => {
       image,
       shop: shop._id,
     });
+
+    shop.items.push(item._id);
+    await shop.save();
+    await shop.populate("items owner");
   } catch (err) {
     console.log("error in the item creation in item controller", err);
     return res
@@ -33,23 +37,56 @@ export { addItem };
 
 const EditItem = async (req, res) => {
   try {
-    const itemId = req.params.itemId;
+  
+    const ItemId = req.params.itemId;
+
     const { name, category, foodType, price } = req.body;
-    let image;
+
+    const updateData = { name, category, foodType, price };
+
     if (req.file) {
-      image: await UploadOnCloudinary(req.file.path);
+      updateData.image = await UploadOnCloudinary(req.file.path);
     }
+
     const item = await Item.findByIdAndUpdate(
-      itemId,
-      { name, category, foodType, price, image },
+       ItemId,
+       updateData ,
+      { name, category, foodType, price },
       { new: true },
     );
+
     if (!item) {
       return res.status(500).json({ message: "item not found" });
     }
-    return res.status(200).json(item);
+
+    const shop = await Shop.findOne({ owner: req.userId }).populate("items");
+    if (!shop) {
+      return res
+        .status(401)
+        .json({ message: "shop not found error in editItem controller" });
+    }
+
+    return res.status(200).json();
   } catch (err) {
-    res.status(500).json({ message: "error occured while edit item" });
+    return res.status(500).json({ message: "error occured while edit item" });
   }
 };
-export {EditItem}
+export { EditItem };
+
+
+
+
+export const getItemById = async (req, res) => {
+  try {
+    const ItemId = req.params.itemId;
+    const item = await Item.findById(ItemId);
+    if (!item) {
+      return res.status(400).json({ message: "item not found" });
+    }
+    return res.status(201).json(item);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "error occured in controller  getItemById" });
+  }
+};

@@ -98,7 +98,7 @@ function Navbar() {
                         {/* For Owner */}
                         {userData.role === "owner" ? <>{ myShopData && <div className=' p-2 text-[#ff4d2d] flex justify-center 
                         items-center gap-2 rounded-lg bg-[#ff4d2d]/10  '> <FaPlus className='font-semibold' />
-                              <button className='hidden md:flex lg:flex font-semibold'>Add Food Item</button>
+                              <button className='hidden md:flex lg:flex font-semibold' onClick={()=>navigate('/add-item')}>Add Food Item</button>
                         </div>}
 
                               <div className='relative p-2 text-[#ff4d2d] flex justify-center 

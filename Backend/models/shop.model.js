@@ -27,10 +27,10 @@ const shopSchema = Schema({
             type:String,
             required:true
       },
-      items:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"item"
-      },
+      items:[{
+              type:mongoose.Schema.Types.ObjectId,
+              ref:"Item",
+      }],
 
 },{timestamps:true})
 

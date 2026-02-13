@@ -6,9 +6,9 @@ dotenv.config();
 
 
 cloudinary.config({
-  cloud_name:"dtickwhmn",
-  api_key:"526628427873274",
-  api_secret: "HBs9fTFBDxY3q4aWDV5hfqQ9QK4",
+  cloud_name:process.env.CLOUDINARY_NAME,
+  api_key:process.env.CLOUDINARY_API_KEY,
+  api_secret:process.env.CLOUDINARY_SECRET,
   
 });
 

@@ -1,35 +1,39 @@
 import UploadOnCloudinary from "../utils/cloudinary.js";
 import { Shop } from "../models/shop.model.js";
+import { Item } from "../models/item.model.js";
 
 
+/// error in this and getshop route
 const createEditShop = async (req,res)=>{
  try{
 
-   console.log("BODY:",req.body);
-   console.log("FILE:",req.file);
-   console.log("USER:",req.userId);
+  const {name,state,city,address } = req.body;
 
-   let image=null;
+  const updatedData = { name, state, city, address };
 
-   if(req.file){
-     image = await UploadOnCloudinary(req.file.path);
-   }
+  let image;
 
-   console.log("IMAGE URL:",image);
+  if(req.file){
+    image = await UploadOnCloudinary(req.file.path);
+    updatedData.image = image;
+  }
 
-   let shop = await Shop.findOne({owner:req.userId});
+  // Try update existing shop
+  let shop = await Shop.findOneAndUpdate(
+    { owner: req.userId },
+    updatedData,
+    { new:true }
+  );
 
-   if(!shop){
-     shop = await Shop.create({
-       ...req.body,
-       image,
-       owner:req.userId
-     });
-   }
+  // If not exist → create
+  if(!shop){
+    shop = await Shop.create({
+      ...updatedData,
+      owner:req.userId
+    });
+  }
 
-   console.log("SHOP:",shop);
-
-   res.json(shop);
+  res.json(shop);
 
  }catch(err){
    console.log("🔥 REAL ERROR:",err);
