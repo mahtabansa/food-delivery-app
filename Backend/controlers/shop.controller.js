@@ -18,7 +18,7 @@ const createEditShop = async (req,res)=>{
     updatedData.image = image;
   }
 
-  // Try update existing shop
+  // update existing shop
   let shop = await Shop.findOneAndUpdate(
     { owner: req.userId },
     updatedData,
@@ -36,7 +36,7 @@ const createEditShop = async (req,res)=>{
   res.json(shop);
 
  }catch(err){
-   console.log("🔥 REAL ERROR:",err);
+   console.log("ERROR:",err);
    res.status(500).send(err.message);
  }
 }
@@ -48,7 +48,10 @@ export {createEditShop}
 const getMyshop = async (req, res) => {
   console.log("req.userId", req.userId);
   try {
-    const shop = await Shop.findOne({ owner: req.userId }).populate("owner items");
+    const shop = await Shop.findOne({ owner: req.userId }).populate("owner").populate({
+      path:"items",
+      options:{sort:{updatedAt:-1}}
+    });
     if (!shop) {
       return res.status(500).json({ message: "shop not found" });
     }
@@ -58,3 +61,25 @@ const getMyshop = async (req, res) => {
   }
 };
 export { getMyshop };
+
+
+const getShopByCity = async(req,res)=>{
+  try {
+  
+  let {city} = req.params;
+
+  const shop = await Shop.findOne({
+  city: { $regex: `^${city}$`, $options: "i" }
+}).populate("items");
+
+  
+  if(!shop){
+    return res.status(400).json({message:"shop not found"});
+  }
+  return res.status(200).json(shop)
+
+  } catch(err){
+    return res.status(500).json({message:"error occurred while get shop By city",err})
+  }
+}
+export {getShopByCity}

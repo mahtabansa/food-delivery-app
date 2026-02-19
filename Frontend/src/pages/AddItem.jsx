@@ -7,6 +7,7 @@ import { FaUtensils } from "react-icons/fa";
 import { useState } from 'react';
 import axios from 'axios';
 import serverUrl from '../App.jsx'
+import { ClipLoader } from 'react-spinners';
 
 const AddItem = () => {
       const navigate = useNavigate();
@@ -19,6 +20,7 @@ const AddItem = () => {
       const [FrontendImage, setFrontendImage] = useState(null);
       const [category, setCategory] = useState("");
       const [foodType, setFoodType] = useState("");
+      const [Loading,setLoading] = useState(false);
      
 
       const categories = [
@@ -51,7 +53,7 @@ const AddItem = () => {
       };
 
       const handleSubmit = async (e) => {
-            console.log(e)
+            setLoading(true);
             e.preventDefault();
             try {
                   const formData = new FormData();
@@ -72,9 +74,10 @@ const AddItem = () => {
                               withCredentials: true  
                         }
                   );
-
+                  console.log("addd itemresult",result)
                   dispatch(setMyShopData(result.data))
-                  navigate('/');
+                  setLoading(false);
+                  navigate("/");
                   
             } catch (err) {
                   console.log("error during form form submission", err);
@@ -161,7 +164,9 @@ const AddItem = () => {
 
 
 
-                              <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl'>SAVE</button>
+                              <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl' disabled={Loading}>
+                                    {Loading ? <ClipLoader size={20} color='white'/>:"SAVE"}
+                              </button>
                         </form>
 
                   </div>

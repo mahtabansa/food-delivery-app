@@ -13,7 +13,9 @@ import CreateEditShop from './pages/CreateEditShop.jsx';
 import AddItem from './pages/AddItem.jsx';
 import EditItem from './pages/EditItem.jsx';
 export const serverUrl= 'http://localhost:8000'
-// "http://localhost:8000/api/shop/create-edit-shop"
+import UseGetShopByCity from './Hooks/UseGetShopByCity.jsx';
+import UseGetItemsInCity from './Hooks/UseGetItemsInCity.jsx';
+
 
 
 function App() {
@@ -21,6 +23,9 @@ function App() {
   useGetCuurentUser();
   UseGetCurrentCity();
   useGetMyShop();
+  UseGetShopByCity();
+  UseGetItemsInCity();
+  
 
   return (
     <>
@@ -39,6 +44,10 @@ function App() {
         <Route path='/edit-item/:itemId' element={userData? <EditItem/>:<Navigate to={"/signin"}/>}/>
         
          <Route path='/get-by-id/:itemId' element={userData? <EditItem/>:<Navigate to={"/signin"}/>}/>
+
+          <Route path='/delete-item/:itemId' element={userData? <Home/>:<Navigate to={"/signin"}/>}/>
+
+           <Route path='/get-shop-by-city/:city' element={userData? <Home/>:<Navigate to={"/signin"}/>}/>
        
       </Routes>
 

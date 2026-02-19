@@ -7,11 +7,10 @@ import { FaUtensils } from "react-icons/fa";
 import { useState } from 'react';
 import axios from 'axios';
 import serverUrl from '../App.jsx'
+import { ClipLoader } from 'react-spinners';
 
 const EditItem = () => {
-        const ItemId= useParams();
-        console.log("ItemId",ItemId.itemId);
-      
+       const ItemId= useParams();
       const {myShopData} = useSelector((state)=>state.owner)
       const navigate = useNavigate();
       const dispatch = useDispatch();
@@ -22,6 +21,7 @@ const EditItem = () => {
       const [FrontendImage, setFrontendImage] = useState("");
       const [category, setCategory] = useState("");
       const [foodType, setFoodType] = useState("");
+      const [loading,setLoading] = useState(false)
 
       const categories = [
             "Snacks",
@@ -50,6 +50,7 @@ const EditItem = () => {
             }
       };
       const handleSubmit = async (e) => {
+            setLoading(true);
             e.preventDefault();
             try {
                   const formData = new FormData();
@@ -70,7 +71,8 @@ const EditItem = () => {
                         });
                         dispatch(setMyShopData(result.data))
                                  
-                  navigate('/')
+                        setLoading(false);
+                    navigate('/');
             } catch (err) {
                   console.log("error during form form submission", err);
             }
@@ -179,13 +181,17 @@ const EditItem = () => {
 
                               <div>
                                     <label htmlFor="price" className='block text-sm font-medium text-gray-900 mb-2'>Price</label>
-                                    <input type="text" placeholder='set your price,min-0' className='w-full px-4 py-2 border rounded-lg focus:outline-none 
+                                    <input type="text" placeholder='set your price,min-0' className='w-full px-4 py-2 border 
+                                    rounded-lg focus:outline-none 
                                     focus:ring-2 focus:ring-orange-500 ' value={price} onChange={(e) => setprice(e.target.value)} />
                               </div>
 
 
 
-                              <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl'>SAVE</button>
+                              <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl' 
+                              disabled={loading}>
+                                    {loading? <ClipLoader className='text-white' size={20}/>:"SAVE"}
+                              </button>
                         </form>
 
                   </div>

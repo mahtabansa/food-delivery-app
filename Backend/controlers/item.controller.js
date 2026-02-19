@@ -25,7 +25,10 @@ const addItem = async (req, res) => {
 
     shop.items.push(item._id);
     await shop.save();
-    await shop.populate("items owner");
+    await shop.populate({
+      path: "owner items",
+      Options: { sort: { updatedAt: -1 } },
+    });
   } catch (err) {
     console.log("error in the item creation in item controller", err);
     return res
@@ -37,7 +40,6 @@ export { addItem };
 
 const EditItem = async (req, res) => {
   try {
-  
     const ItemId = req.params.itemId;
 
     const { name, category, foodType, price } = req.body;
@@ -49,8 +51,8 @@ const EditItem = async (req, res) => {
     }
 
     const item = await Item.findByIdAndUpdate(
-       ItemId,
-       updateData ,
+      ItemId,
+      updateData,
       { name, category, foodType, price },
       { new: true },
     );
@@ -59,7 +61,10 @@ const EditItem = async (req, res) => {
       return res.status(500).json({ message: "item not found" });
     }
 
-    const shop = await Shop.findOne({ owner: req.userId }).populate("items");
+    const shop = await Shop.findOne({ owner: req.userId }).populate({
+      path: "items",
+      options: { sort: { updatedAt: -1 } },
+    });
     if (!shop) {
       return res
         .status(401)
@@ -72,9 +77,6 @@ const EditItem = async (req, res) => {
   }
 };
 export { EditItem };
-
-
-
 
 export const getItemById = async (req, res) => {
   try {
@@ -90,3 +92,62 @@ export const getItemById = async (req, res) => {
       .json({ message: "error occured in controller  getItemById" });
   }
 };
+
+const deleteItem = async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+
+    const item = await Item.findByIdAndDelete(itemId);
+
+    if (!item) {
+      return res.status(400).json({ message: "item not found" });
+    }
+
+    const shop = await Shop.findOne({ owner: req.userId });
+
+    shop.items = shop.items.filter((i) => i.toString() !== item._id.toString());
+    shop.save();
+
+    await shop.populate({
+      path: "items",
+      options: { sort: { updatedAt: -1 } },
+    });
+
+    return res.status(200).json(shop);
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ message: "error occured while deleting item", err });
+  }
+};
+export { deleteItem };
+
+
+const getItemBycity = async (req, res) => {
+  try {
+    const { city } = req.params;
+    if (!city) return res.status(400).json({ message: "city required" });
+
+    const shops = await Shop.find({
+  city: { $regex: `^${city}$`, $options: "i" }
+}).populate("items");
+
+  
+    if (shops.length === 0) {
+      return res.status(404).json({ message: "shop not found" });
+    }
+
+    const shopIds = shops.map((shop) => shop._id);
+
+    const items = await Item.find({
+      shop: { $in: shopIds },
+    });
+
+    return res.status(200).json(items);
+
+  } catch (err) {
+    console.log("error occured while get shop by city controller", err);
+    res.status(500).json({ message: "server error" });
+  }
+};
+export {getItemBycity}

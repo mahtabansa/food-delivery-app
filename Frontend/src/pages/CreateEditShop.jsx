@@ -6,6 +6,7 @@ import { setMyShopData } from '../Redux/ownerSlice.js';
 import { FaUtensils } from "react-icons/fa";
 import { useState } from 'react';
 import axios from 'axios';
+import { ClipLoader } from 'react-spinners';
 
 
 const CreateEditShop = () => {
@@ -20,6 +21,7 @@ const CreateEditShop = () => {
       const [address, setAddress] = useState(myShopData?.address || currentAddress || "");
       const [BackendImage, setBackendImage] = useState(null);
       const [FrontendImage, setFrontendImage] = useState(myShopData?.image || null);
+      const [loading,setLoading] = useState(false);
 
 
       const handleImage = (e) => {
@@ -38,6 +40,7 @@ const CreateEditShop = () => {
       };
 
       const handleSubmit = async (e) => {
+              setLoading(true);
             e.preventDefault();
             try {
                   const formData = new FormData();
@@ -58,10 +61,9 @@ const CreateEditShop = () => {
                         }
 
                   );
-                  console.log("result error create editshop.jsx", result);
 
-                  console.log("result int he create edit route", result);
                   dispatch(setMyShopData(result.data))
+                  setLoading(false);
                   navigate('/')
             } catch (err) {
                   console.log("error during form form submission", err);
@@ -129,7 +131,10 @@ const CreateEditShop = () => {
                                     focus:outline-none 
                                     focus:ring-2 focus:ring-orange-500 ' value={address} onChange={(e) => setAddress(e.target.value)} />
                               </div>
-                              <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl'>SAVE</button>
+                              <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl' 
+                              disabled={loading}>
+                                    {loading? <ClipLoader className='text-white' size={20}/>:"SAVE"}
+                              </button>
                         </form>
 
                   </div>
