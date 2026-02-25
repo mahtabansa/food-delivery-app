@@ -61,7 +61,7 @@ function UserDashboard() {
                   shopEl.removeEventListener("scroll", handleShopScroll);
             };
 
-      }, []);   // 🚀 no dependency
+      }, []);   
 
       return (
             <>
@@ -135,8 +135,8 @@ function UserDashboard() {
                                     className="overflow-x-auto scroll-smooth "
                               >
                                     <div className="flex ">
-                                          {!shopsInMyCity ? <p>Loadding...</p> : shopsInMyCity?.map((shop) => (
-                                                <CategoryCard name={shop.name} image={shop.image} key={shop._id} />
+                                          {!shopsInMyCity ? <p>Loadding...</p> : shopsInMyCity?.map((shop ,id) => (
+                                                <CategoryCard name={shop.name} image={shop.image} key={id} />
                                           ))
                                           }
                                     </div>
@@ -158,8 +158,8 @@ function UserDashboard() {
                               
                                     <h1 className="text-gray-800 text-2xl sm:text-3xl items-start pb-5"> suggested Food items</h1>
                              
-                              <div className="flex gap-5 ">{ ItemsInMyCity?.map((data)=>(
-                                   < FoodCard data={data} key={data._id}/>
+                              <div className="flex gap-5 ">{ ItemsInMyCity?.map((data,id)=>(
+                                   < FoodCard data={data} key={id}/>
                               ))} </div>
 
                         </div>

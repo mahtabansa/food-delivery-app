@@ -14,7 +14,7 @@ const UseGetItemsInCity = () => {
             const fetchItem = async () => {
                   const result = await axios.get(`http://localhost:8000/api/item/get-item-bycity/${currentCity}`,
                          { withCredentials: true });
-                  console.log("result in fetch Item", result.data);
+               
                   dispatch(setItemsInMyCity(result.data))
 
             }

@@ -15,7 +15,11 @@ import EditItem from './pages/EditItem.jsx';
 export const serverUrl= 'http://localhost:8000'
 import UseGetShopByCity from './Hooks/UseGetShopByCity.jsx';
 import UseGetItemsInCity from './Hooks/UseGetItemsInCity.jsx';
-
+import CartPage from './pages/CartPage.jsx';
+import CheckOut from './pages/CheckOut.jsx';
+import OrderPlaced from './pages/OrderPlaced.jsx';  
+import MyOrder from './components/MyOrder.jsx';
+import UseGetMyOrders from './Hooks/UseGetMyOrder.jsx';
 
 
 function App() {
@@ -25,6 +29,7 @@ function App() {
   useGetMyShop();
   UseGetShopByCity();
   UseGetItemsInCity();
+  UseGetMyOrders();
   
 
   return (
@@ -48,6 +53,16 @@ function App() {
           <Route path='/delete-item/:itemId' element={userData? <Home/>:<Navigate to={"/signin"}/>}/>
 
            <Route path='/get-shop-by-city/:city' element={userData? <Home/>:<Navigate to={"/signin"}/>}/>
+
+          <Route path='/cart-page' element={userData? <CartPage/>:<Navigate to={"/signin"}/>}/>
+
+          <Route path='/check-out' element={userData? <CheckOut/>:<Navigate to={"/signin"}/>}/> 
+
+          <Route path='/order-placed' element={userData? <OrderPlaced/>:<Navigate to={"/signin"}/>}/> 
+
+          <Route path='/my-orders' element={userData? <MyOrder/>:<Navigate to={"/signin"}/>}/> 
+
+
        
       </Routes>
 

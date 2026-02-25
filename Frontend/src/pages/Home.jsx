@@ -5,7 +5,7 @@ import DeliveryBoy from '../components/DeliveryBoy.jsx'
 import OwnerDashboard from '../components/OwnerDashboard.jsx'     
 export default function Home(){
       const userData = useSelector(state=>state.user.userData);
-      console.log("home user data",userData);
+  
       return(
            <div className='w-[100vw] min-h-[100vh] pt-[100px] flex flex-col  items-center bg-[#fff9f6]'>
                    

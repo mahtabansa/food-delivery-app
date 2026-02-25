@@ -13,7 +13,8 @@ import setUserData, { setCurrentCity } from '../Redux/userSlice.js';
 import { LuReceipt } from "react-icons/lu";
 
 function Navbar() {
-      const { userData, city } = useSelector(state => state.user);
+      const { userData, currentCity ,CardItems } = useSelector(state => state.user);
+    
       const { myShopData } = useSelector(state => state.owner);
       const [showInfo, setShowInfo] = useState(false);
       const [showSearch, setShowSearch] = useState(false);
@@ -21,6 +22,7 @@ function Navbar() {
       const navigate = useNavigate();
       const primaryColor = "#ff4d2d";
       const hoverColro = "#e64323";
+
 
       const handlelogout = async () => {
             const user = await axios.post('http://localhost:8000/api/auth/signout', {}, { withCredentials: true });
@@ -41,7 +43,7 @@ function Navbar() {
                         <div className='flex items-center  overflow-hidden 
                         gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                               <FaLocationDot size={25} className='text-[#ff4d2d]' />
-                              <div className='text-gray-600 truncate'>{city}</div>
+                              <div className='text-gray-600 truncate'>{currentCity}</div>
 
                         </div>
 
@@ -66,7 +68,7 @@ function Navbar() {
                               <div className='flex items-center w-[30%] overflow-hidden 
                         gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                                     <FaLocationDot size={25} className='text-[#ff4d2d]' />
-                                    <div className='w-[80%] text-gray-600 truncate'>{city}</div>
+                                    <div className='w-[80%] text-gray-600 truncate'>{currentCity}</div>
 
                               </div>
 
@@ -88,12 +90,11 @@ function Navbar() {
                         }
 
 
-                        {userData.role === "user" && <div className='relative cursor-pointer'>
+                        {userData.role === "user" && <div className='relative cursor-pointer' onClick={()=>navigate('/cart-page')}>
                               <IoCartOutline className='text-[#ff4d2d] cursor-pointer text-2xl' />
-                              <span className='absolute right-[-9px] top-[-12px] text-[#ff4d2d] '>0</span>
+                              <span className='absolute right-[-9px] top-[-12px] text-[#ff4d2d] '>{CardItems.length   }</span>
                         </div>
                         }
-
 
                         {/* For Owner */}
                         {userData.role === "owner" ? <>{ myShopData && <div className=' p-2 text-[#ff4d2d] flex justify-center 
@@ -103,8 +104,8 @@ function Navbar() {
 
                               <div className='relative p-2 text-[#ff4d2d] flex justify-center 
                         items-center gap-2 rounded-lg bg-[#ff4d2d]/10 outline-none '>
-                                    <LuReceipt className='font-semibold h-[20px] w-[20px]' />
-                                    <span className='font-semibold hidden md:flex lg:flex'>My Orders</span>
+                                    <LuReceipt className='font-semibold h-[20px] w-[20px]' onClick={()=>navigate('/my-orders')} />
+                                    <span className='font-semibold hidden md:flex lg:flex' onClick={()=>navigate('/my-orders')}>My Orders</span>
                                     <span className='absolute -right-2 -top-2 text-xs font-bold text-white
                                     bg-[#ff4d2d] rounded-lg px-[6px] py-[1px]'>0</span>
                               </div>
@@ -112,7 +113,7 @@ function Navbar() {
                         </> : (
                               <>
                                     <button className='hidden md:block px-3 py-2 rounded-lg bg-[#ff4d2d]/10 
-                                    text-[#ff4d2d]'>My Order</button>
+                                    text-[#ff4d2d]' onClick={()=>navigate('/my-orders')}>My Order</button>
                               </>
                         )}
 
@@ -134,7 +135,7 @@ function Navbar() {
                         
 
                               <h1 className='p-2 truncate '>{userData ? userData.fullName : "Guest"}</h1>
-                              <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold'>my order</div>
+                              <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold' onClick={()=>navigate('/my-orders')}>my order</div>
                               <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold'
                                     onClick={() => handlelogout()}>logout</div>
                         </div>

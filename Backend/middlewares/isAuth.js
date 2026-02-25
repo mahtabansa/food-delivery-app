@@ -6,8 +6,7 @@ export const isAuth = async (req, res, next) => {
   try {
     const token = req.cookies.token;
     console.log("TOKEN:", req.cookies);
-    console.log("HEADER:", req.headers.authorization);
-
+    
     if (!token) {
       return res.status(400).json({ message: "token not found" });
     }
