@@ -5,11 +5,12 @@ import axios from 'axios';
 
 const UseGetItemsInCity = () => {
       const dispatch = useDispatch();
-      const { currentCity } = useSelector((state) => state.user);
+      const { currentCity ,userData} = useSelector((state) => state.user);
  
 
       useEffect(() => {
-             if (!currentCity) return;
+             if (!currentCity || !userData) return;
+
 
             const fetchItem = async () => {
                   const result = await axios.get(`http://localhost:8000/api/item/get-item-bycity/${currentCity}`,

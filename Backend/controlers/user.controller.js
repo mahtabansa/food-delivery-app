@@ -1,16 +1,51 @@
-import  User  from "../models/user.model.js"
-export const getCurrentUser =  async(req,res)=> {
-try {  
-      const userId = req.userId;
-      if(!userId){
-            return res.status(200).json({message:"user Is not found"})
-      }
-      const user = await User.findById(userId).select("-password");
-      if(!user) {
-            return res.status(400).json({message:"user does not exist"});
-      }
-      return res.status(200).json(user);
-   } catch(error){
-      return res.status(500).json({message:`get current user error ${error}`});``
-   }
-}
+import User from "../models/user.model.js";
+ const getCurrentUser = async (req, res) => {
+  try {
+ 
+
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(200).json({ message: "user Is not found" });
+    }
+     const user = await User.findById(userId).select("-password");
+    
+    if (!user) {
+      return res.status(400).json({ message: "user does not exist" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: `get current user error ${error}` });
+    
+  }
+};
+ export {getCurrentUser}
+
+const updateuserLocation = async (req, res) => {
+ 
+  try {
+    const { longitude, latitude } = req.body;
+    console.log("longitude, latitude ",longitude, latitude );
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      {
+        location: {
+          type: "Point",
+          coordinates: [longitude,latitude],
+        },
+      },
+      { new: true },
+    );
+
+
+    if (!user) {
+      return res.status(500).json(`user location does not update`);
+    }
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: `error while updating user location ${err}` });
+  }
+};
+
+
+export {updateuserLocation}

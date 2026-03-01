@@ -68,7 +68,7 @@ const getShopByCity = async(req,res)=>{
   
   let {city} = req.params;
 
-  const shop = await Shop.findOne({
+  const shop = await Shop.find({
   city: { $regex: `^${city}$`, $options: "i" }
 }).populate("items");
 

@@ -3,4 +3,4 @@ function DeliveryBoy(){
             <h1>Delivery bodydash borad</h1>
       )
 }
-export default DeliveryBoy;
+export  {DeliveryBoy};

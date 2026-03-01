@@ -1,41 +1,48 @@
 import mongoose from "mongoose";
-import User from "./user.model";
+
 
 const deliveryAssignmentSchema = new mongoose.Schema({
 
-      order:{
-            type:mongoose.Schema.Types.ObjectId,
-             ref:"Order"
-      },
-       shop:{
-            type:mongoose.Schema.Types.ObjectId,
-             ref:"Shop"
-      },
-      shopOrderId:{
-            type:mongoose.Schema.Types.ObjectId,
-            required:true
-      },
+  order:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Order",
+    required:true
+  },
 
-      broadCastedTo:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"User",
-      },
-      assignedTo:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"User",
-            default:null
-      },
-      status:{
-            type:String,
-            enum:["broadcasted","assigned","completed"],
-            default:"broadcasted"
-      },
-      accepedAt:Date
+  shop:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Shop",
+    required:true
+  },
+
+  shopOrderId:{
+    type:mongoose.Schema.Types.ObjectId,
+    required:true,
+    index:true
+  },
+
+  broadCastedTo:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
+  }],
+
+  assignedTo:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User",
+    default:null
+  },
+
+  status:{
+    type:String,
+    enum:["broadcasted","assigned","completed"],
+    default:"broadcasted"
+  },
+
+  acceptedAt:Date
+
+},{timestamps:true});
+
+const DeliveryAssignment = mongoose.model("DeliveryAssignment",deliveryAssignmentSchema);
 
 
-},{timestamps:true})
-
-const deliveryAssignment = new mongoose.model("deliveryAssignment",deliveryAssignmentSchema);
-
-
-export {deliveryAssignment}
+export {DeliveryAssignment}

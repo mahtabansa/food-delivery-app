@@ -1,7 +1,9 @@
 import { Shop } from "../models/shop.model.js";
 import { Order } from "../models/order.model.js";
 import User from "../models/user.model.js";
+import { DeliveryAssignment } from "../models/deliveryAssignment.model.js";
 const placeOrder = async (req, res) => {
+ 
   try {
     const {
       CardItems,
@@ -12,8 +14,6 @@ const placeOrder = async (req, res) => {
       latitude,
     } = req.body;
 
-    // Here you would typically save the order to your database
-    // For this example, we'll just return a success message
     if (
       CardItems.length === 0 ||
       !totalAmount ||
@@ -44,6 +44,7 @@ const placeOrder = async (req, res) => {
             .json({ message: `Shop with id ${shopId[0]} not found` });
         }
 
+       
         const shopid = shop._id;
         const items = groupItemByShop[shopid];
 
@@ -66,7 +67,7 @@ const placeOrder = async (req, res) => {
         };
       }),
     );
-    console.log("deliveryAddress", longitude, latitude);
+
     const newOrder = new Order({
       user: req.userId,
       paymentMethod,
@@ -86,7 +87,6 @@ const placeOrder = async (req, res) => {
     res.status(500).json({ message: "Failed to place order" });
   }
 };
-
 export { placeOrder };
 
 const getMyOrders = async (req, res) => {
@@ -94,7 +94,7 @@ const getMyOrders = async (req, res) => {
     const userid = req.userId;
 
     const user = await User.findById(userid);
-    console.log("user", user);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -113,78 +113,105 @@ const getMyOrders = async (req, res) => {
         .populate("user")
         .populate("shopOrder.shopOrderItems.item", "name image price");
 
-      console.log("orders", orders);
       return res.status(200).json({ orders });
     }
   } catch (err) {
     res.status(500).json({ message: "error in getting orders", err });
   }
 };
-// const getMyOrders = async (req, res) => {
-//   try {
-//     const userid = req.userId;
-//     const role = req.role; // middleware se bhejo
-
-//     let query = role === "owner"
-//       ? { "shopOrder.owner": userid }
-//       : { user: userid };
-
-//     const orders = await Order.find(query)
-//       .sort({ createdAt: -1 })
-//       .populate([
-//         {
-//           path: "user",
-//           select: "name email mobile",
-//         },
-//         {
-//           path: "shopOrder.shop",
-//           select: "name image",
-//         },
-//         {
-//           path: "shopOrder.owner",
-//           select: "name email mobile",
-//         },
-//         {
-//           path: "shopOrder.shopOrderItems.item",
-//           select: "name image price",
-//         },
-//       ]);
-
-//     return res.status(200).json({ orders });
-
-//   } catch (err) {
-//     res.status(500).json({ message: "error in getting orders", err });
-//   }
-// };
 
 export { getMyOrders };
+
 const updateorderStatus = async (req, res) => {
   try {
     const { orderId, shopId } = req.params;
     const { status } = req.body;
 
     const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ message: "order not found" });
-    }
+    if (!order) return res.status(404).json({ message: "order not found" });
 
-    // find correct shop order
-    const shopOrder = order.shopOrder.find(o => o.shop.equals(shopId));
+    const shopOrder = order.shopOrder.find((o) => o.shop.equals(shopId));
+    if (!shopOrder) return res.status(404).json({ message: "shop order not found" });
 
-    if (!shopOrder) {
-      return res.status(404).json({ message: "shop order not found" });
-    }
-
-    // update status
     shopOrder.status = status;
+    let deliveryBoysPayload = [];
 
-    // save parent document
+    if (status === "out of delivery" && !shopOrder.assignment) {
+      
+      // ✅ Bug 1 Fix — order ki delivery location use karo
+      console.log("order",order)
+      console.log("shopOrder",shopOrder)
+      const {longitude, latitude }= order;
+      console.log("longitude, latitude",longitude, latitude)
+
+      const nearByDeliveryBoys = await User.find({
+        role: "deliveryBoy",
+        location: {
+          $near: {
+            $geometry: { type: "Point", coordinates: [longitude, latitude] },
+            $maxDistance: 1000,
+          },
+        },
+      });
+
+      const nearByIds = nearByDeliveryBoys.map((b) => b._id);
+
+      const busyIds = await DeliveryAssignment.find({
+        assignedTo: { $in: nearByIds },
+        status: { $nin: ["broadcasted", "completed"] },
+      }).distinct("assignedTo");
+
+      const busySet = new Set(busyIds.map((id) => String(id)));
+
+      const availableDeliveryBoys = nearByDeliveryBoys.filter(
+        (b) => !busySet.has(String(b._id))
+      );
+
+      const candidates = availableDeliveryBoys.map((b) => b._id);
+
+      if (candidates.length === 0) {
+        await order.save(); // ✅ Bug 2 Fix — await lagaya
+        return res.json({
+          message: "order status updated but no delivery boy available",
+          availableDeliveryBoys: [],
+        });
+      }
+
+      const deliveryAssignment = await DeliveryAssignment.create({
+        order: order._id,
+        shop: shopOrder.shop,
+        shopOrderId: shopOrder._id,
+        broadCastedTo: candidates,
+        status: "broadcasted",
+      });
+
+      // shopOrder.assignment = deliveryAssignment._id;
+
+      deliveryBoysPayload = availableDeliveryBoys.map((b) => ({
+        id: b._id,
+        name: b.fullName,
+        longitude: b.location.coordinates?.[0],
+        latitude: b.location.coordinates?.[1],
+        mobile: b.mobile,
+      }));
+    }
+
     await order.save();
 
-    // populate after save
+    // ✅ Bug 3 Fix — pehle populate, phir find
+    await order.populate("shopOrder.shop", "name");
+    await order.populate("shopOrder.assignedDeliveryBoy", "fullName email mobile");
 
+    const updatedShopOrder = order.shopOrder.find((o) =>
+      o.shop._id.equals(shopId)
+    );
 
-    return res.status(200).json(shopOrder);
+    return res.status(200).json({
+      shopOrder: updatedShopOrder,
+      assignedDeliveryBoy: updatedShopOrder?.assignedDeliveryBoy,
+      availableDeliveryBoys: deliveryBoysPayload,
+      assignment: updatedShopOrder?.assignment,
+    });
 
   } catch (err) {
     console.log(err);

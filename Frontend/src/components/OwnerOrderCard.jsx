@@ -2,25 +2,30 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import { updateStatus } from '../Redux/userSlice.js';
 import axios from 'axios';
+import { useState } from 'react';
+
 const OwnerOrderCard = ({ data }) => {
-  const dispatch =  useDispatch();
-  const handleupdateStatus = async( orderId,shopId,status)=> {
-     try{
+  const [availableBoys, setAvailableBoys] = useState([]);
+  const dispatch = useDispatch();
+  const handleupdateStatus = async (orderId, shopId, status) => {
+    try {
       const result = await
-        axios.post(`http://localhost:8000/api/order/update-status/${orderId}/${shopId}`,{status},{withCredentials:true});
-        console.log("resutl",result)
-        dispatch(updateStatus({orderId,shopId,status}))
- 
-     } catch(err){
+        axios.post(`http://localhost:8000/api/order/update-status/${orderId}/${shopId}`, { status }, { withCredentials: true });
+      console.log("results in the ownerDashBoard", result)
+      dispatch(updateStatus({ orderId, shopId, status }))
+
+      setAvailableBoys(result?.data?.availableDeliveryBoys)
+
+    } catch (err) {
       console.log(`error occured during change status ${err}`)
-     }
+    }
   }
 
   return (
     <div className='bg-white p-4 shadow-6 shadow-lg space-y-6 '>
       <div className='flex flex-col justify-center'>
         <h1 className='text-md font-bold text-gray-600'>User Name . : {data?.user?.fullName}</h1>
-      
+
       </div>
 
       <div className='flex flex-col justify-center'>
@@ -38,13 +43,13 @@ const OwnerOrderCard = ({ data }) => {
                 <div className='flex flex-start flex-col'>
                   <div key={index} className=' flex  flex-col rounded-lg p-2 bg-white gap-2'>
                     <img src={item.item.image} alt={item.item.name} className='h-20 rounded-md object-cover' />
-                     <p className='text-md font-bold text-gray-600'>Food Name: {item?.item.name}</p>
-                   <p className='text-md font-bold text-gray-600'>Food Type: {data?.shopOrder[0].shopOrderItems[0].foodType}</p>
-                  <p className='text-md font-bold text-gray-600'>Quantity: {data?.shopOrder[0].shopOrderItems[0].quantity}</p>
-                   <p className='text-md font-bold text-gray-600'>Price for One: {data?.shopOrder[0].shopOrderItems[0].item.price}</p>
+                    <p className='text-md font-bold text-gray-600'>Food Name: {item?.item.name}</p>
+                    <p className='text-md font-bold text-gray-600'>Food Type: {data?.shopOrder[0].shopOrderItems[0].foodType}</p>
+                    <p className='text-md font-bold text-gray-600'>Quantity: {data?.shopOrder[0].shopOrderItems[0].quantity}</p>
+                    <p className='text-md font-bold text-gray-600'>Price for One: {data?.shopOrder[0].shopOrderItems[0].item.price}</p>
                   </div>
 
-                   
+
                 </div>
               ))}
             </div>
@@ -58,14 +63,26 @@ const OwnerOrderCard = ({ data }) => {
       <div className="flex justify-between">
         <span className='text-[#ff4d2d]'>Status: {data?.shopOrder[0].status}</span>
 
-        <select className='text-[#ff4d2d] rounded-lg boder-[#ff4d2d] focus:outline-[#ff4d2d] p-2' onChange={(e)=>handleupdateStatus(data?._id,data?.shopOrder[0]?.shop._id ,e.target.value)}>
-           <option value="">change</option>
+        <select className='text-[#ff4d2d] rounded-lg boder-[#ff4d2d] focus:outline-[#ff4d2d] p-2' onChange={(e) => handleupdateStatus(data?._id, data?.shopOrder[0]?.shop._id, e.target.value)}>
+
           <option value="pending">pending</option>
           <option value="preparing">Preparing</option>
           <option value="out of delivery">Out for Delivery</option>
 
         </select>
       </div>
+
+      {data?.shopOrder[0]?.status == "out of delivery" && 
+        availableBoys?.length > 0 ? availableBoys.map((b, index) => 
+          (
+            <div className='p-2 gap-3 bg-orange-50 border border-gray-600 rounded-lg shadow-md'>
+              <h1>Available delivery Boys </h1>
+              <p><span >Name:{b.name}</span>,<span> Mobile:{b.mobile}</span></p>
+            </div>
+          )
+        ):
+        <div><h1>wait searching delivery boys near you  </h1></div>
+      } 
 
       <h1 className='text-right font-bold'>SubTotal : {data?.shopOrder[0].subtotal}</h1>
 

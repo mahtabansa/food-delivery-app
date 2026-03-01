@@ -13,36 +13,33 @@ cloudinary.config({
 });
 
 const UploadOnCloudinary = async (filePath) => {
-
-  
   try {
-    if (!filePath) {
-    return null;
-  }
-      const fixedPath = filePath.replace(/\\/g,"/");
-   
-    const result = await cloudinary.uploader.upload(
-     fixedPath,{folder:"shops"}
-      
-    );
+    if (!filePath) return null;
 
-    if (!result) {
-      return result;
-    }
+    const fixedPath = filePath.replace(/\\/g, "/");
+
+    const result = await cloudinary.uploader.upload(fixedPath, {
+      folder: "shops",
+    });
+
+    if (!result) return null;
+
     console.log("Upload successful:", result.secure_url);
 
-       if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // ✅ fixedPath ya original dono kaam karenge, but consistent rakho
+    if (fs.existsSync(fixedPath)) {
+      fs.unlinkSync(fixedPath);
     }
 
-
     return result.secure_url;
+
   } catch (err) {
-   
     console.log("Cloudinary upload error:", err);
+    // ✅ File fail hone par bhi delete karo
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
     return null;
   }
 };
-
 export default UploadOnCloudinary;
-

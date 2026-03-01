@@ -11,10 +11,10 @@ import { RxCross1 } from "react-icons/rx";
 import { FaPlus } from "react-icons/fa6";
 import setUserData, { setCurrentCity } from '../Redux/userSlice.js';
 import { LuReceipt } from "react-icons/lu";
-
+import {DeliveryBoy} from './DeliveryBoy.jsx'
 function Navbar() {
       const { userData, currentCity ,CardItems } = useSelector(state => state.user);
-    
+      
       const { myShopData } = useSelector(state => state.owner);
       const [showInfo, setShowInfo] = useState(false);
       const [showSearch, setShowSearch] = useState(false);
@@ -38,6 +38,7 @@ function Navbar() {
               fixed top-0 z-[99999] bg-[#fff9f6] overflow-visible ">
 
 
+                
                   {userData.role === "user" && showSearch && <div className='flex flex-row fixed top-[90px] w-[90%] h-[70px] md:hidden lg:hidden 
                      bg-white shadow-xl rounded-lg items-center gap-[20px] '>
                         <div className='flex items-center  overflow-hidden 
@@ -141,6 +142,7 @@ function Navbar() {
                         </div>
                         }
                   </div>
+
 
             </div>
       )

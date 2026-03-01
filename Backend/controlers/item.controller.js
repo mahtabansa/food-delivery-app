@@ -29,6 +29,7 @@ const addItem = async (req, res) => {
       path: "owner items",
       Options: { sort: { updatedAt: -1 } },
     });
+      return res.status(201).json(shop);
   } catch (err) {
     console.log("error in the item creation in item controller", err);
     return res

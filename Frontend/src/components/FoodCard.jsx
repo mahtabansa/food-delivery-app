@@ -43,7 +43,7 @@ const FoodCard = ({ data }) => {
 
 
   return (
-    <div key={data._id} className='min-w-[150px] h-[10px] bg-blue-500  md:w-[200px] md:h-[200px] border-2 rounded-2xl  border-[#ff4d2d] 
+    <div  className='min-w-[150px] h-[10px] bg-blue-500  md:w-[200px] md:h-[200px] border-2 rounded-2xl  border-[#ff4d2d] 
         shrink-0 overlfow-hidden bg-white shadow-xl shadow-gray-200 hover:shandow-lg transition-shadow transform  transition-transform flex justify-center relative hover:scale-110'>
       <div className=''>
         <div className='absolute top-1 right-1 text-2xl p-2 bg-orange-200 rounded-full'>

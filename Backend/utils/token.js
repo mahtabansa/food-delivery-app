@@ -1,7 +1,11 @@
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 configDotenv();
-export default function gentoken(userId){
+ console.log("JWT_KEY in gentoken:", process.env.JWT_KEY);
+  function gentoken(userId){
+  
+  console.log("userId in the gentoken controller",userId)
+ 
     try {
       return (jwt.sign(
         {  userId },
@@ -13,3 +17,4 @@ export default function gentoken(userId){
     }
   };
   
+  export { gentoken}

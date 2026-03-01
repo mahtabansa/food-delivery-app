@@ -5,15 +5,15 @@ import { setMyShopData } from '../Redux/ownerSlice.js'
 
 
 const useGetMyShop = () => {
-  const {userData} = useSelector((state)=>state.user);
+  const {userData , shopsInMyCity} = useSelector((state)=>state.user);
   const dispatch =  useDispatch();
    useEffect(()=> {
-   
+       
         if(!userData || userData.role !== "owner") return;
       const fetchShop = async() => {
       
             const result = await axios.get("http://localhost:8000/api/shop/get-my",{withCredentials:true});
-           
+              console.log("get my shops",result)
              if(!result){
                   console.log("resutl not found");
              }  
@@ -22,7 +22,7 @@ const useGetMyShop = () => {
       } 
     fetchShop();
       
-  },[userData])
+  },[shopsInMyCity])
 }
 
 export default useGetMyShop

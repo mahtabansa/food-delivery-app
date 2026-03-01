@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CategoryCard = ({ name, image}) => {
+const CategoryCard = ({ image,name}) => {
   return (
     <div className='min-w-[120px] h-[100px] bg-blue-500  md:w-[180px] md:h-[180px] border-2 rounded-2xl  border-[#ff4d2d] 
         shrink-0 overlfow-hidden bg-white shadow-xl shadow-gray-200 hover:shadow-lg transition-shadow relative flex justify-center items-center'>

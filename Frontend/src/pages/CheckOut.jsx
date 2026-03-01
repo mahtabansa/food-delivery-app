@@ -100,7 +100,7 @@ const CheckOut = () => {
             },{withCredentials:true})
             .then(res => {
                   console.log("Order placed successfully:", res.data);
-                
+                  dispatch(setMyorder(res.data.order))
                   dispatch(addMyOrder(res.data.order));
                  
                   navigate("/order-placed");

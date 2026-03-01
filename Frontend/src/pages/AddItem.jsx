@@ -20,8 +20,8 @@ const AddItem = () => {
       const [FrontendImage, setFrontendImage] = useState(null);
       const [category, setCategory] = useState("");
       const [foodType, setFoodType] = useState("");
-      const [Loading,setLoading] = useState(false);
-     
+      const [Loading, setLoading] = useState(false);
+
 
       const categories = [
             "Snacks",
@@ -66,19 +66,21 @@ const AddItem = () => {
                         formData.append("image", BackendImage);
                   }
 
-               
+
                   const result = await axios.post(
                         "http://localhost:8000/api/item/add-item",
                         formData,
                         {
-                              withCredentials: true  
+                              withCredentials: true
                         }
                   );
-                  console.log("addd itemresult",result)
+                 
                   dispatch(setMyShopData(result.data))
+
                   setLoading(false);
                   navigate("/");
-                  
+
+
             } catch (err) {
                   console.log("error during form form submission", err);
             }
@@ -131,7 +133,7 @@ const AddItem = () => {
 
                                     <select
                                           className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500'
-                                          name="foodType"              
+                                          name="foodType"
                                           value={foodType}
                                           onChange={(e) => setFoodType(e.target.value)}
                                     >
@@ -165,7 +167,7 @@ const AddItem = () => {
 
 
                               <button className='bg-[#ff4d2d] text-white font-semibold w-full hover:bg-orange-600 py-2 rounded-xl' disabled={Loading}>
-                                    {Loading ? <ClipLoader size={20} color='white'/>:"SAVE"}
+                                    {Loading ? <ClipLoader size={20} color='white' /> : "SAVE"}
                               </button>
                         </form>
 

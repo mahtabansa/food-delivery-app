@@ -90,6 +90,9 @@ const userSlice = createSlice({
 
       shopOrder.status = status;
     },
+      clearUser: (state) => {
+      state.userData = null;
+    }
   },
 });
 export const {
@@ -106,6 +109,7 @@ export const {
   setMyorder,
   addMyOrder,
   updateStatus,
+  clearUser
 } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;

@@ -28,7 +28,7 @@ export default function SignUp() {
   const dispatch = useDispatch();
 
 const handleSignUp = async (event) => {
-  console.log("handle signup event",event.target.value);
+
   setloader(true);
   event.preventDefault();
     // Add validation before sending
@@ -92,13 +92,11 @@ const handlewithGoogle = async () => {
   }
   const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    console.log("Google auth successful:", result.user);
-    console.log(result.user.email);
   try{  
        let {data} = await axios.post('http://localhost:8000/api/auth/google-auth',
         {
          fullName:result.user.displayName,email:result.user.email,
-         mobile,role
+          mobile:mobile ,role
        },{withCredentials:true})
        dispatch(setUserData(data));
        setError("");
@@ -180,8 +178,8 @@ const handlewithGoogle = async () => {
         {error && <p className="text-[#ff4d2d] py-3 " >*{error}</p>}
 
        <button className="flex items-center justify-center gap-3 w-full 
-      border border-gray-400 mt-2 p-2
-       rounded-lg transition duration-gray-400 hover:bg-gray-100" onClick={handlewithGoogle}>
+          border border-gray-400 mt-2 p-2
+          rounded-lg transition duration-gray-400 hover:bg-gray-100" onClick={handlewithGoogle}>
         <FcGoogle size={20} />
         <span className="text-lg" >sign up with Google</span>
         </button>

@@ -20,16 +20,22 @@ import CheckOut from './pages/CheckOut.jsx';
 import OrderPlaced from './pages/OrderPlaced.jsx';  
 import MyOrder from './components/MyOrder.jsx';
 import UseGetMyOrders from './Hooks/UseGetMyOrder.jsx';
+import { UseUpdateUserLocation } from './Hooks/useUpdateUserLocation.jsx';
+import {DeliveryBoy} from './components/DeliveryBoy.jsx';
+
 
 
 function App() {
   const userData = useSelector((state) => state.user.userData);
+ 
   useGetCuurentUser();
+   console.log("userData",userData);
   UseGetCurrentCity();
   useGetMyShop();
   UseGetShopByCity();
   UseGetItemsInCity();
   UseGetMyOrders();
+   UseUpdateUserLocation();
   
 
   return (
@@ -62,7 +68,7 @@ function App() {
 
           <Route path='/my-orders' element={userData? <MyOrder/>:<Navigate to={"/signin"}/>}/> 
 
-
+          
        
       </Routes>
 

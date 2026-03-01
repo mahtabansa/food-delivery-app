@@ -4,15 +4,13 @@ import dotenv from "dotenv"
 dotenv.config()
 export const isAuth = async (req, res, next) => {
   try {
+   
     const token = req.cookies.token;
-    console.log("TOKEN:", req.cookies);
     
     if (!token) {
       return res.status(400).json({ message: "token not found" });
     }
     const decodeToken = jwt.verify(token, process.env.JWT_KEY);
-
-    console.log("decodetoeken", decodeToken);
 
     req.userId = decodeToken.userId;
 
@@ -27,9 +25,3 @@ export const isAuth = async (req, res, next) => {
   }
 };
 
-// if(!decodeToken){
-//       return res.status(400).json({message:"Token not verified"})
-//     }
-//      console.log(decodeToken);
-//     req.userId = decodeToken.userId;
-//     next();
