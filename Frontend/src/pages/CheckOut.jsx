@@ -10,11 +10,12 @@ import 'leaflet/dist/leaflet.css';
 import { setLocation } from '../Redux/mapSlice.js';
 import axios from 'axios';
 import { setAddress } from '../Redux/mapSlice.js';
-import { MdDeliveryDining } from "react-icons/md";
- import { IoPhonePortraitOutline } from "react-icons/io5";
- import { FiCreditCard } from "react-icons/fi";
+import { MdDeliveryDining, MdDescription } from "react-icons/md";
+import { IoPhonePortraitOutline } from "react-icons/io5";
+import { FiCreditCard } from "react-icons/fi";
 import { addMyOrder } from '../Redux/userSlice.js';
 import { setMyorder } from '../Redux/userSlice.js';
+
 
 function RecenterMap({ location }) {
       if (location.lat || location.log) {
@@ -26,15 +27,15 @@ function RecenterMap({ location }) {
 const CheckOut = () => {
       const navigate = useNavigate();
       const dispatch = useDispatch();
-      const {TotalAmount,CardItems,Myorder} = useSelector(state => state.user);
-      console.log("card items",CardItems)
-      console.log("total amount",TotalAmount)
+      const { TotalAmount, CardItems, Myorder, userData } = useSelector(state => state.user);
+      console.log("userdata ", userData)
+      console.log("total amount", TotalAmount)
       const apikey = import.meta.env.VITE_GEOCODING_APIKEY;
       const { location, address } = useSelector(state => state.map);
       const [addressInput, setAddressInput] = useState(address || '');
       const [paymentMethod, setPaymentMethod] = useState("cod");
-  
-      const deliveryfees = TotalAmount>500? 0:40;
+
+      const deliveryfees = TotalAmount > 500 ? 0 : 40;
 
       const ondragend = (e) => {
             const marker = e.target;
@@ -62,12 +63,12 @@ const CheckOut = () => {
       }
 
       const getCurrentLocation = () => {
-            navigator.geolocation.getCurrentPosition(async (postion) => {
-                  const lat = postion.coords.latitude;
-                  const log = postion.coords.longitude;
-                  dispatch(setLocation({ lat: lat, log: log }));
-                  getaddressByLatLog(lat, log)
-            })
+            const log = userData?.location?.coordinates[0];
+            const lat = userData?.location?.coordinates[1];
+
+            dispatch(setLocation({ lat: lat, log: log }));
+            getaddressByLatLog(lat, log)
+
       }
       const getlatlogByAddress = async () => {
             try {
@@ -87,39 +88,84 @@ const CheckOut = () => {
             }
       }
 
-      
-      const handlePlaceOrder = async ()=>{
-          await  axios.post("http://localhost:8000/api/order/place-order",{
+
+      const handlePlaceOrder = async () => {
+            await axios.post("http://localhost:8000/api/order/place-order", {
                   CardItems,
-                  totalAmount:TotalAmount + deliveryfees,
-                  deliveryAddress:address,
-                  longitude:location.log,
-                  latitude:location.lat,
+                  totalAmount: TotalAmount + deliveryfees,
+                  deliveryAddress: address,
+                  longitude: location.log,
+                  latitude: location.lat,
                   paymentMethod,
-                
-            },{withCredentials:true})
-            .then(res => {
-                  console.log("Order placed successfully:", res.data);
-                  dispatch(setMyorder(res.data.order))
-                  dispatch(addMyOrder(res.data.order));
-                 
-                  navigate("/order-placed");
-            })
-            .catch(err => {
-                  console.error("Error placing order:", err);
-            })
+
+            }, { withCredentials: true })
+                  .then(res => {
+                        console.log("Order placed successfully:", res);
+
+                        if (paymentMethod === "cod") {
+                              dispatch(setMyorder(res.data.order))
+                              dispatch(addMyOrder(res.data.order));
+                              navigate("/order-placed");
+                        } else {
+                              console.log("const orderId = res.data.order.orderId:", res.data.orderId);
+                              console.log("const razorOrder = res.data.order.razorOrder", res.data.razorOrder);
+                              const orderId = res.data.orderId;
+                              const razorOrder = res.data.razorOrder;
+                              openRazorPayWindow(orderId, razorOrder)
+                        }
+
+
+
+                  })
+                  .catch(err => {
+                        console.error("Error placing order:", err);
+                  })
       }
 
+      const openRazorPayWindow = async (orderId, razorOrder) => {
+            const options = {
+                  key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                  amount: razorOrder.amount, currency: "INR",
+                  name: "Vingo",
+                  description: " food delivery website ",
+                  order_id: razorOrder.id,
+                  handler: async (response) => {
+                        console.log("response ",response);
+                        try {
+                              const result = await axios.post(
+                                    'http://localhost:8000/api/order/verify-payment',
+                                    {
+                                          orderId,
+                                          razorpay_payment_id: response.razorpay_payment_id,
+                                          razorpay_order_id: response.razorpay_order_id,   
+                                          razorpay_signature: response.razorpay_signature   
+                                    },
+                                    { withCredentials: true }
+                              );
+                              console.log("result in verify payment", result);
+                              dispatch(setMyorder(result.data));
+                              navigate("/order-placed");
+                        } catch (err) {
+                              console.log("error while verify-payment", err.response?.data);
+                        }
+                  }
+
+            }
+
+            const rzp = new window.Razorpay(options)
+            rzp.open()
+
+      }
       useEffect(() => {
             setAddressInput(address);
 
-      }, [address ])
+      }, [address])
 
-     
+
       return (
-            <div className='min-h-screen bg-[#fff9f6] flex items-center justify-center '>
+            <div className='min-h-screen bg-[#fff9f6] flex items-center justify-center relative'>
                   {/* here will be back icons */}
-                  <div className='flex  gap-[20px] mx-4 '>
+                  <div className='flex  gap-[20px] absolute left-10 right-30 top-10'>
                         <div className='z-10' onClick={() => navigate(-1)}>
                               <IoArrowBack size={35} className='text-[#ff4d2d] cursor-pointer' />
                         </div>
@@ -171,7 +217,7 @@ const CheckOut = () => {
                                           <div className='p-2 bg-green-100 rounded-full'>
                                                 <MdDeliveryDining className='text-green-500' size={30} />
                                           </div>
-                                          
+
                                           <div className='flex flex-col pb-1'>
                                                 <h1 className='text-gray-700 text-lg font-medium'> Cash on Delivery</h1>
                                                 <h1 className='text-gray-500 text-sm'>pay when you receive the order</h1>
@@ -179,11 +225,11 @@ const CheckOut = () => {
                                     </div>
 
                                     <div className={`flex items-center gap-3 rounded-lg bg-gray-100 p-4 py-4 text-left  hover:bg-gray-200 ${paymentMethod == "online" ? " border border-[#ff4d2d] bg-orange-50" : "border-gray-200 hover:border-gray-300"}`} onClick={() => setPaymentMethod("online")}>
-                                            <div className='p-2 bg-purple-100 rounded-full'>
+                                          <div className='p-2 bg-purple-100 rounded-full'>
                                                 <IoPhonePortraitOutline className='text-purple-500' size={25} />
                                           </div>
 
-                                           <div className='p-2 bg-blue-100 rounded-full'>
+                                          <div className='p-2 bg-blue-100 rounded-full'>
                                                 <FiCreditCard className='text-blue-500' size={30} />
                                           </div>
 
@@ -202,37 +248,37 @@ const CheckOut = () => {
                               <h2 className='text-lg font-semibold text-gray-800 m-6'>Summary</h2>
                               <div className='m-4 bg-gray-100 p-4 rounded-lg'>
 
-                             
-                              <div className=''>
-                                    {CardItems.map((item,idx)=> (
-                                     <div key={idx} className='flex justify-between'>
-                                          <h3 className='text-gray-700'>{item.name} x {item.quantity}</h3>
-                                          <h3 className='text-gray-700'>₹{item.price * item.quantity}</h3>
-                                    </div>
-                                    ))}
 
-                                     <div className='flex justify-between'>
-                                          <h3 className='text-gray-700'>Subtotal</h3>
-                                          <h3 className='text-gray-700'>₹{TotalAmount}</h3>
-                                    </div>
-                                    <div className='flex justify-between'>
-                                          <h3 className='text-gray-700'>Delivery Fee</h3>
-                                          <h3 className='text-gray-700'>₹{deliveryfees}</h3>
-                                    </div>
+                                    <div className=''>
+                                          {CardItems.map((item, idx) => (
+                                                <div key={idx} className='flex justify-between'>
+                                                      <h3 className='text-gray-700'>{item.name} x {item.quantity}</h3>
+                                                      <h3 className='text-gray-700'>₹{item.price * item.quantity}</h3>
+                                                </div>
+                                          ))}
+
+                                          <div className='flex justify-between'>
+                                                <h3 className='text-gray-700'>Subtotal</h3>
+                                                <h3 className='text-gray-700'>₹{TotalAmount}</h3>
+                                          </div>
+                                          <div className='flex justify-between'>
+                                                <h3 className='text-gray-700'>Delivery Fee</h3>
+                                                <h3 className='text-gray-700'>₹{deliveryfees}</h3>
+                                          </div>
 
 
-                                    <hr className='my-2 border-gray-200' />
-                                    <div className='flex justify-between'>
-                                          <h3 className='text-[#ff4d2d] font-bold text-xl '>Total</h3>
-                                          <h3 className='text-[#ff4d2d] font-bold text-xl '>₹{TotalAmount + deliveryfees}</h3>
+                                          <hr className='my-2 border-gray-200' />
+                                          <div className='flex justify-between'>
+                                                <h3 className='text-[#ff4d2d] font-bold text-xl '>Total</h3>
+                                                <h3 className='text-[#ff4d2d] font-bold text-xl '>₹{TotalAmount + deliveryfees}</h3>
+                                          </div>
                                     </div>
-                              </div>
                               </div>
                         </section>
 
                         <section>
-                              <button className='w-[97%]  bg-[#ff4d2d] text-white py-2 p-4 m-4 rounded-md text-lg font-medium hover:bg-[#ff4d2d]/90 '  onClick={handlePlaceOrder}>
-                                   {paymentMethod ==="cod"?"place order":"pay & place order"}
+                              <button className='w-[97%]  bg-[#ff4d2d] text-white py-2 p-4 m-4 rounded-md text-lg font-medium hover:bg-[#ff4d2d]/90 ' onClick={handlePlaceOrder}>
+                                    {paymentMethod === "cod" ? "place order" : "pay & place order"}
                               </button>
                         </section>
 

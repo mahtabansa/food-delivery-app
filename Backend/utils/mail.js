@@ -29,3 +29,22 @@ transporter.verify(function (error, success) {
   }
 });
 
+
+ const sendDeliveryOptMail= async (userEmail,otp) => {
+  console.log("userEmail in mailer ",userEmail)
+  const info = await transporter.sendMail({
+    from:process.env.EMAIL,      
+    to:userEmail,
+    subject: " your Delivery Otp",
+    html:`<p>Delivery Opt is <b>${otp}.It expires in the 5 min</b></p>`, 
+  });
+}
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log("SMTP Error:", error);
+  } else {
+    console.log("Server is ready to send emails");
+  }
+});
+
+export {sendDeliveryOptMail}

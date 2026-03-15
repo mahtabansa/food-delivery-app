@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { CiSearch } from "react-icons/ci";
 import { FaLocationDot, FaS } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
@@ -11,13 +11,15 @@ import { RxCross1 } from "react-icons/rx";
 import { FaPlus } from "react-icons/fa6";
 import setUserData, { setCurrentCity } from '../Redux/userSlice.js';
 import { LuReceipt } from "react-icons/lu";
-import {DeliveryBoy} from './DeliveryBoy.jsx'
+import { setSearchItem } from '../Redux/userSlice.js';
+
 function Navbar() {
-      const { userData, currentCity ,CardItems } = useSelector(state => state.user);
-      
+      const { userData, currentCity, CardItems } = useSelector(state => state.user);
+
       const { myShopData } = useSelector(state => state.owner);
       const [showInfo, setShowInfo] = useState(false);
       const [showSearch, setShowSearch] = useState(false);
+      const [query, setQuery] = useState("");
       const dispatch = useDispatch();
       const navigate = useNavigate();
       const primaryColor = "#ff4d2d";
@@ -25,20 +27,36 @@ function Navbar() {
 
 
       const handlelogout = async () => {
-            const user = await axios.post('http://localhost:8000/api/auth/signout', {}, { withCredentials: true });
+            const user = await axios.post('http://localhost:8000/api/auth/signout', { withCredentials: true });
             console.log("logout response", user);
             dispatch(setUserData(null));
             dispatch(setCurrentCity(null));
             navigate("/signin");
       }
 
+
+      const handleSearchitem = async () => {
+            
+            const result = await axios.get(`http://localhost:8000/api/item/search-item?query=${query}&city=${currentCity}`, { withCredentials: true });
+            console.log("result", result)
+
+            dispatch(setSearchItem(result.data.searchResults))
+
+
+      }
+      useEffect(() => {
+           
+            if(!query) return;
+             handleSearchitem();
+
+      }, [query])
       return (
             <div className="w-screen h-[80px] flex items-center justify-between
              md:justify-center gap-[30px]
               fixed top-0 z-[99999] bg-[#fff9f6] overflow-visible ">
 
 
-                
+
                   {userData.role === "user" && showSearch && <div className='flex flex-row fixed top-[90px] w-[90%] h-[70px] md:hidden lg:hidden 
                      bg-white shadow-xl rounded-lg items-center gap-[20px] '>
                         <div className='flex items-center  overflow-hidden 
@@ -54,7 +72,7 @@ function Navbar() {
                                     size={20} onClick={() => setShowSearch(false)} />
 
                               <input type="text" placeholder='search delicious food .....'
-                                    className='hover:none px-[5px] text-gray-700 outline-0' name='search'
+                                    className='hover:none px-[5px] text-gray-700 outline-0' name='search' onChange={(e) => setQuery(e.target.value)} value={query}
                               />
                         </div>
                   </div>
@@ -77,7 +95,7 @@ function Navbar() {
                                     <CiSearch className='flex font-extrabold items-center text-[#ff4d2d]'
                                           size={20} onClick={() => setShowSearch(prev => !prev)} />
                                     <input type="text" placeholder='search delicious food .....'
-                                          className='hover:none px-[10px] text-gray-700 outline-0 w-full' name='search'
+                                          className='hover:none px-[10px] text-gray-700 outline-0 w-full' name='search' value={query} onChange={(e) => setQuery(e.target.value)}
                                     />
                               </div>
                         </div>
@@ -87,26 +105,26 @@ function Navbar() {
                         {userData.role === "user" && showSearch ? <RxCross1 onClick={() =>
                               setShowSearch(false)} /> : <CiSearch className='flex font-                          
                              extrabold items-center text-[#ff4d2d] cursor-pointer md:hidden lg:hidden'
-                                    size={20} onClick={() => setShowSearch(true) }  />
+                                    size={20} onClick={() => setShowSearch(true)} />
                         }
 
 
-                        {userData.role === "user" && <div className='relative cursor-pointer' onClick={()=>navigate('/cart-page')}>
+                        {userData.role === "user" && <div className='relative cursor-pointer' onClick={() => navigate('/cart-page')}>
                               <IoCartOutline className='text-[#ff4d2d] cursor-pointer text-2xl' />
-                              <span className='absolute right-[-9px] top-[-12px] text-[#ff4d2d] '>{CardItems.length   }</span>
+                              <span className='absolute right-[-9px] top-[-12px] text-[#ff4d2d] '>{CardItems.length}</span>
                         </div>
                         }
 
                         {/* For Owner */}
-                        {userData.role === "owner" ? <>{ myShopData && <div className=' p-2 text-[#ff4d2d] flex justify-center 
-                        items-center gap-2 rounded-lg bg-[#ff4d2d]/10  '> <FaPlus className='font-semibold' onClick={()=>navigate('/add-item')} />
-                              <button className='hidden md:flex lg:flex font-semibold' onClick={()=>navigate('/add-item')}>Add Food Item</button>
+                        {userData.role === "owner" ? <>{myShopData && <div className=' p-2 text-[#ff4d2d] flex justify-center 
+                        items-center gap-2 rounded-lg bg-[#ff4d2d]/10  '> <FaPlus className='font-semibold' onClick={() => navigate('/add-item')} />
+                              <button className='hidden md:flex lg:flex font-semibold' onClick={() => navigate('/add-item')}>Add Food Item</button>
                         </div>}
 
                               <div className='relative p-2 text-[#ff4d2d] flex justify-center 
                         items-center gap-2 rounded-lg bg-[#ff4d2d]/10 outline-none '>
-                                    <LuReceipt className='font-semibold h-[20px] w-[20px]' onClick={()=>navigate('/my-orders')} />
-                                    <span className='font-semibold hidden md:flex lg:flex' onClick={()=>navigate('/my-orders')}>My Orders</span>
+                                    <LuReceipt className='font-semibold h-[20px] w-[20px]' onClick={() => navigate('/my-orders')} />
+                                    <span className='font-semibold hidden md:flex lg:flex' onClick={() => navigate('/my-orders')}>My Orders</span>
                                     <span className='absolute -right-2 -top-2 text-xs font-bold text-white
                                     bg-[#ff4d2d] rounded-lg px-[6px] py-[1px]'>0</span>
                               </div>
@@ -114,7 +132,7 @@ function Navbar() {
                         </> : (
                               <>
                                     <button className='hidden md:block px-3 py-2 rounded-lg bg-[#ff4d2d]/10 
-                                    text-[#ff4d2d]' onClick={()=>navigate('/my-orders')}>My Order</button>
+                                    text-[#ff4d2d]' onClick={() => navigate('/my-orders')}>My Order</button>
                               </>
                         )}
 
@@ -127,16 +145,16 @@ function Navbar() {
                         </div>
 
 
-                        {showInfo && <div className=' flex flex-col fixed  top-20 right-[3%]  md:right-[5%] lg:right-[20%] 
-                        rounded-lg bg-white h-[50vh] w-[200px] z-[999999] shadow-lg    '>
-                              <button className='absolute black right-[10px] top-[10px]' onClick={()=>navigate(-1)}><RxCross1 className='text-orange-600 text-xl font-extrabold'></RxCross1></button>
+                        {showInfo && <div className={`flex flex-col  fixed   ${userData.role == "deliveryBoy" ? 'top-20 right-[20%] sm:right-[1%] md:right-[10%] lg:right-[40%] ' : 'top-20 right-[3%]  md:right-[5%] lg:right-[20%]'} 
+                        rounded-lg bg-white h-[50vh] w-[200px] z-[999999] shadow-lg    `}>
+                              <button className='absolute black right-[10px] top-[10px]' onClick={() => navigate(-1)}><RxCross1 className='text-orange-600 text-xl font-extrabold'></RxCross1></button>
                               <div className='w-full h-[50px] flex  items-center justify-center text-lg font-bold 
                                  text-gray-700 border-b-[1px] border-gray-400'>My Profile
                               </div>
-                        
+
 
                               <h1 className='p-2 truncate '>{userData ? userData.fullName : "Guest"}</h1>
-                              <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold' onClick={()=>navigate('/my-orders')}>my order</div>
+                              <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold' onClick={() => navigate('/my-orders')}>my order</div>
                               <div className='p-2 text-[#ff4d2d] hover:text-red-500 cursor-pointer text-md font-semibold'
                                     onClick={() => handlelogout()}>logout</div>
                         </div>

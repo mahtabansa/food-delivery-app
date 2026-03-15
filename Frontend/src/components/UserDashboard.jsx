@@ -5,11 +5,13 @@ import { FaChevronRight } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import FoodCard from "./FoodCard.jsx";
-import { data } from "react-router-dom";
+import {FoodCard} from "./FoodCard.jsx";
+import { useNavigate } from "react-router-dom";
+
 
 function UserDashboard() {
-      const { currentCity,shopsInMyCity, ItemsInMyCity } = useSelector(state => state.user);
+      const { currentCity, shopsInMyCity, ItemsInMyCity ,SearchItem} = useSelector(state => state.user);
+      console.log("SearchItem",SearchItem)
       const shop = shopsInMyCity?.[0]
       const CateScrollRef = useRef();
       const shopScrollRef = useRef();
@@ -17,6 +19,9 @@ function UserDashboard() {
       const [showRightCateButton, setShowRightCateButton] = useState(false);
       const [showLeftShopButton, setShowLeftShopButton] = useState(false);
       const [showRightShopButton, setShowRightShopButton] = useState(false);
+      const [updateditems, setupdateditems] = useState([]);
+      const Navigate = useNavigate();
+
 
 
       const UpdateButton = (ref, setLeftButton, setRightButton) => {
@@ -33,6 +38,17 @@ function UserDashboard() {
                         behavior: "smooth"
                   })
             }
+      }
+
+      const handleClickitem = async (category) => {
+
+            if (category === "Others") {
+                  setupdateditems(ItemsInMyCity)
+            }
+            if (!ItemsInMyCity) return;
+
+            const filterItem = ItemsInMyCity.filter((i) => i.category === category)
+            setupdateditems(filterItem)
       }
       useEffect(() => {
 
@@ -54,19 +70,34 @@ function UserDashboard() {
             // initial check
             handleCateScroll();
             handleShopScroll();
-
+            setupdateditems(ItemsInMyCity)
             // cleanup
             return () => {
                   cateEl.removeEventListener("scroll", handleCateScroll);
                   shopEl.removeEventListener("scroll", handleShopScroll);
             };
 
-      }, []);   
+      }, [ItemsInMyCity]);
 
       return (
             <>
                   <div className='w-screen min-h-screen overflow-x-hidden flex flex-col gap-5 items-center bg-[#fff9f6]'>
                         <Navbar />
+                              { SearchItem && (<div
+                              className="w-full max-w-6xl flex flex-col flex-start justify-center p-5  bg-[#fff9f6] rounded-2xl mt-4  ">
+
+                                    <h1 className="text-gray-900 text-2xl sm:text-3xl font-semibold-b border-gray-200 pb-2  text-center pb-4">Your search results </h1>
+
+                                    <div className="w-full h-auto flex flex-wrap gap-6 justify-center"> {SearchItem?.map((item)=>(
+                                          <FoodCard  data={item} key={item._id} />
+                                    ))}
+
+                                    </div>
+                                    </div>)
+                                    }
+
+
+
 
                         <h1 className="text-gray-800 text-2xl sm:text-3xl">
                               inspiration for your first orders
@@ -91,7 +122,7 @@ function UserDashboard() {
                               >
                                     <div className="flex gap-4 pb-4">
                                           {categories.map((item) => (
-                                                <CategoryCard name={item.category} image={item.image} key={item._id} />
+                                                <CategoryCard name={item.category} image={item.image} key={item._id} onClick={() => handleClickitem(item.category)} />
                                           ))}
                                     </div>
                               </div>
@@ -132,10 +163,10 @@ function UserDashboard() {
                               <div
                                     ref={shopScrollRef}
                                     className="overflow-x-auto scroll-smooth "
-                              >    
+                              >
                                     <div className="flex gap-5 ">
                                           {!shop ? <p>Loadding...</p> : shop?.map((shop) => (
-                                                <CategoryCard name={shop?.name} image={shop?.image} key={shop._id} />
+                                                <CategoryCard name={shop?.name} image={shop?.image} key={shop._id} onClick={() => Navigate(`/get-ByshopId/${shop._id}`)} />
                                           ))
                                           }
                                     </div>
@@ -153,16 +184,27 @@ function UserDashboard() {
                               }
                         </div>
 
-                      { <div className="w-screen w-min-screen max-w-6xl relative my-5 ">
+                        <div className="w-full max-w-6xl mx-auto px-4 my-5">
 
-                                    <h1 className="text-gray-800 text-2xl sm:text-3xl items-start pb-5"> suggested Food items</h1>
-                             
-                              <div className="flex gap-5 ">{ ItemsInMyCity?.map((data,id)=>(
-                                   < FoodCard data={data} key={id}/>
-                              ))} </div>
+                              <h1 className="text-gray-800 text-2xl sm:text-3xl font-semibold pb-5">
+                                    Suggested Food Items
+                              </h1>
+
+                              {/* Scrollable row on mobile, wrapping grid on larger screens */}
+                              <div className="
+                                          flex gap-4
+                                          overflow-x-auto pb-3
+                                          sm:flex-wrap sm:overflow-visible
+                                          scrollbar-hide
+                                                ">
+                                    {updateditems?.map((data, id) => (
+                                          <div key={id} className="shrink-0 sm:shrink w-[150px] sm:w-auto">
+                                                <FoodCard data={data} />
+                                          </div>
+                                    ))}
+                              </div>
 
                         </div>
-                        }
 
 
                   </div>

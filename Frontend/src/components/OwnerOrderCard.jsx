@@ -72,17 +72,24 @@ const OwnerOrderCard = ({ data }) => {
         </select>
       </div>
 
-      {data?.shopOrder[0]?.status == "out of delivery" && 
-        availableBoys?.length > 0 ? availableBoys.map((b, index) => 
+      {data?.shopOrder[0]?.status == "out of delivery" &&
+        <div> {data?.shopOrder[0]?.assignedDeliveryBoy?<h1 className='font-bold text-xl pb-2'>Assigned Delivery Boy </h1>:<h1 className='font-bold text-xl pb-2'>Available delivery Boys </h1>} 
+
+          {availableBoys?.length > 0 ? (availableBoys.map((b, index) =>
           (
             <div className='p-2 gap-3 bg-orange-50 border border-gray-600 rounded-lg shadow-md'>
-              <h1>Available delivery Boys </h1>
               <p><span >Name:{b.name}</span>,<span> Mobile:{b.mobile}</span></p>
             </div>
-          )
-        ):
-        <div><h1>wait searching delivery boys near you  </h1></div>
-      } 
+             ))) :data?.shopOrder[0]?.assignedDeliveryBoy
+            ? <div className='flex flex-col p-2 bg-gray-100 border border-orange-200 rounded-lg '><p>{data?.shopOrder[0]?.assignedDeliveryBoy
+              .fullName}</p>  <p>{data?.shopOrder[0]?.assignedDeliveryBoy
+              .mobile} </p> {data?.shopOrder[0]?.assignedDeliveryBoy.email}
+</div> :
+            <div>waiting for deivery boy to accept</div>
+          }
+
+        </div>
+      }
 
       <h1 className='text-right font-bold'>SubTotal : {data?.shopOrder[0].subtotal}</h1>
 

@@ -9,4 +9,5 @@ shopRouter.post("/create-edit-shop",isAuth,upload.single("image"),createEditShop
 shopRouter.get("/get-my",isAuth,getMyshop);
 shopRouter.get("/get-shop-by-city/:city",isAuth,getShopByCity);
 
+
 export { shopRouter }

@@ -1,6 +1,10 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 // Data coming from MyOrderCard
+
 const UserOrderCard = ({ data }) => {
+ 
+  const navigate = useNavigate()
   console.log("data in user order card", data)
   return (
     <div className='flex flex-col bg-white p-4 shadow-lg space-y-4'>
@@ -18,34 +22,61 @@ const UserOrderCard = ({ data }) => {
         </div>
       </div>
 
-      {
-        data.shopOrder.map((shoporder, index) => (
-          <div key={index} className=' border bg-gray-100 p-2 shadow-md rounded-lg space-y-2'>
+{data.shopOrder.map((shoporder, index) => (
+  <div
+    key={index}
+    className="border border-gray-200 bg-white rounded-2xl shadow-sm overflow-hidden mb-4"
+  >
+    {/* Shop Header */}
+    <div className="bg-[#fff5f3] px-4 py-3 border-b border-gray-100">
+      <h1 className="text-base font-bold text-[#ff4d2f] tracking-wide">
+        🏪 {shoporder.shop.name}
+      </h1>
+    </div>
 
-           <h1 className='text-lg font-bold text-gray-600'>Owner: {shoporder.shop.name}</h1>
-            <div className='flex space-x-4 overflow-x-auto pb-2'>
-              {shoporder.shopOrderItems.map((item, index) => (
-                <div className='flex flex-start'>
-                  <div key={index} className=' flex-shrink-0 w-30 h-30 rounded-lg p-2 bg-white gap-2'>
-                    <img src={item.item.image} alt={item.item.name} className='w-full h-full rounded-md object-cover' />
-                  </div>
-
-                  <div className='gap-5 p-4'>
-                    <h3 className='text-md font-bold text-gray-600 pb-1'>{item.item.name}</h3>
-                    <p className='text-gray-500 pb-1'>Quantity: {item.quantity}</p>
-                    <p className='text-gray-500'>Price: ₹{item.price}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-           
-
+    {/* Items List */}
+    <div className="divide-y divide-gray-100">
+      {shoporder.shopOrderItems.map((item, idx) => (
+        <div
+          key={idx}
+          className="flex items-center gap-3 p-3 sm:p-4"
+        >
+          {/* Image */}
+          <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100">
+            <img
+              src={item.item.image}
+              alt={item.item.name}
+              className="w-full h-full object-cover"
+            />
           </div>
 
+          {/* Details */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-800 truncate">
+              {item.item.name}
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+              Qty: {item.quantity}
+            </p>
+            <p className="text-sm font-bold text-gray-700 mt-0.5">
+              ₹{item.price}
+            </p>
+          </div>
 
-        ))
-      }
+          {/* Track Button — always at end */}
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => navigate(`/track-order/${data._id}`)}
+              className="bg-[#ff4d2f] hover:bg-[#e03d20] active:scale-95 transition-all text-white text-xs sm:text-sm font-semibold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl whitespace-nowrap shadow-sm"
+            >
+              Track Order
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+))}
     </div>
   )
 }

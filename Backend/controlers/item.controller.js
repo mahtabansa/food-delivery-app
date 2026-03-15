@@ -29,7 +29,7 @@ const addItem = async (req, res) => {
       path: "owner items",
       Options: { sort: { updatedAt: -1 } },
     });
-      return res.status(201).json(shop);
+    return res.status(201).json(shop);
   } catch (err) {
     console.log("error in the item creation in item controller", err);
     return res
@@ -123,17 +123,15 @@ const deleteItem = async (req, res) => {
 };
 export { deleteItem };
 
-
 const getItemBycity = async (req, res) => {
   try {
     const { city } = req.params;
     if (!city) return res.status(400).json({ message: "city required" });
 
     const shops = await Shop.find({
-  city: { $regex: `^${city}$`, $options: "i" }
-}).populate("items");
+      city: { $regex: `^${city}$`, $options: "i" },
+    }).populate("items");
 
-  
     if (shops.length === 0) {
       return res.status(404).json({ message: "shop not found" });
     }
@@ -145,10 +143,78 @@ const getItemBycity = async (req, res) => {
     });
 
     return res.status(200).json(items);
-
   } catch (err) {
     console.log("error occured while get shop by city controller", err);
     res.status(500).json({ message: "server error" });
   }
 };
-export {getItemBycity}
+export { getItemBycity };
+
+const getItemsByShopId = async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    console.log("shopId", shopId);
+
+    const shop = await Shop.findById(shopId).populate("items");
+
+    if (!shop) {
+      return res.status(404).json({ message: "shop not found" });
+    }
+
+    return res.status(200).json({
+      shop,
+      items: shop.items,
+    });
+  } catch (err) {
+    console.log(err); 
+    return res.status(500).json({
+      message: "error occurred while getting shop items",
+      err,
+    });
+  }
+};
+export { getItemsByShopId };
+
+const searchItems = async (req, res) => {
+  try {
+    const { query, city } = req.query;
+    if (!query || !city) return;
+    const searchShops = await Shop.find({
+      city: { $regex: city, $options: "i" }, 
+    }).populate("items");
+
+    if (searchShops.length == 0) {
+      return res.status(404).json({ message: "shop not found" });
+    }
+
+    const shopIds = searchShops.map((i) => i._id);
+
+    const searchResults = await Item.find({
+      shop: { $in: shopIds },
+      $or: [{ name: { $regex: query, $options: "i" } }],
+    })
+      .populate("shop")
+      .populate("name")
+      .populate("image");
+
+    if (searchResults.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No items found for your search",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      searchResults,
+    });
+  } catch (error) {
+    console.error("Search error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+export { searchItems };

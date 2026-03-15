@@ -1,16 +1,28 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { IoArrowBack } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { OwnerOrderCard } from './OwnerOrderCard.jsx'
 import { UserOrderCard } from './UserOrderCard.jsx'
+import { setMyorder } from '../Redux/userSlice.js'
 
 
 const MyOrder = () => {
   const navigate = useNavigate()
-  const { Myorder, userData } = useSelector((state) => state.user);
+  const dispatch= useDispatch()
+  const { Myorder, userData,socket  } = useSelector((state) => state.user);
   const orders = Myorder?.orders || [];
 
+  useEffect(()=>{
+        socket?.on('newOrder',(data)=>{
+          if(data?.shoporder?.owner._id===userData._id){
+            dispatch(setMyorder([data ,...MyOrder]))
+          }
+        })
+        return()=>{
+          socket.off('newOrder')
+        }
+  },[socket])
   return (
     <div className='w-full min-h-screen bg-[#fff9f6] flex  justify-center '>
       <div className='w-full max-w-[800px] p-4 '>

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const userSchema = new mongoose.Schema(
   {
@@ -37,16 +38,17 @@ const userSchema = new mongoose.Schema(
     location: {
       type: {
         type: String,
-        enum: ["Point"],
-       
-       
+        enum: ["Point"],      
       },
       coordinates: {
-        type: [Number], // [lng, lat]
-      
-      
+        type: [Number], // [lng, lat]     
       },
     },
+    socketId:{type:String},
+    isOnline:{
+      type:Boolean,
+      default:false
+    }
   },
   { timestamps: true },
 );

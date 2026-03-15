@@ -39,10 +39,17 @@ const ShopOrderSchema =new Schema(
     },
     assignedDeliveryBoy:{
        type: mongoose.Schema.Types.ObjectId,
-      ref:"User",
-    }
-
-    
+       ref:"User",
+       
+    },
+      deliveryOtp: {
+      type: String,
+      default:null
+    },
+    expiresOtp:{
+      type:Date
+    },
+    deliveredAt:{type:Date}
   },
   { timestamps: true },
 );
@@ -71,6 +78,19 @@ const orderSchema =new Schema(
       required: true,
     },
     shopOrder: [ShopOrderSchema],
+
+    payment:{
+      type:Boolean,
+      default:false
+    },
+    razorpayOrderId:{
+      type:String,
+      default:""
+    },
+    razorpayPaymentId:{
+      type:String,
+      default:""
+    }
   },
 
 

@@ -24,7 +24,7 @@ const updateuserLocation = async (req, res) => {
  
   try {
     const { longitude, latitude } = req.body;
-    console.log("longitude, latitude ",longitude, latitude );
+   
     const user = await User.findByIdAndUpdate(
       req.userId,
       {
