@@ -24,7 +24,6 @@ const io = new Server(server, {
   },
 });
 
-app.set('io',io)
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -35,6 +34,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.set("io",io)
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);

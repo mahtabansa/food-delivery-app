@@ -101,11 +101,17 @@ const CheckOut = () => {
             }, { withCredentials: true })
                   .then(res => {
                         console.log("Order placed successfully:", res);
-
+                        let data = res.data.order;
+                        let updatesOrder = Myorder?.orders
+                        console.log("data",data);
+                        console.log("res.data.order",updatesOrder);
                         if (paymentMethod === "cod") {
-                              dispatch(setMyorder(res.data.order))
-                              dispatch(addMyOrder(res.data.order));
-                              navigate("/order-placed");
+                             
+                              dispatch(addMyOrder(data));
+                              
+                               navigate("/order-placed");
+                           
+                             
                         } else {
                               console.log("const orderId = res.data.order.orderId:", res.data.orderId);
                               console.log("const razorOrder = res.data.order.razorOrder", res.data.razorOrder);

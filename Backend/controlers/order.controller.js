@@ -117,20 +117,20 @@ const placeOrder = async (req, res) => {
     );
     await newOrder.populate("shopOrder.shop", "name socketId");
     await newOrder.populate("user", "name email mobile");
-     await newOrder.populate("shopOrder.owner", "name socketId");
+    await newOrder.populate("shopOrder.owner", "name socketId");
 
-    const io = req.app.get("io");
-  
+    const io = req.app.get("io");    
     if(io) {
       newOrder.shopOrder.forEach((shoporder) => {
         const ownerSocketId = shoporder.owner.socketId;
-        if(ownerSocketId) {
+        console.log("ownerSocketId in the order controller",ownerSocketId)
+        if (ownerSocketId) {
           io.to(ownerSocketId).emit("newOrder", {
-            id:newOrder._id,
+            _id: newOrder._id,
             user: newOrder.user,
-            payment: newOrder.paymentMethod,
-            shoporder,
-            deliveryAddress:newOrder.deliveryAddress,
+            payment:newOrder.paymentMethod,
+            shopOrder:[shoporder],
+            deliveryAddress: newOrder.deliveryAddress,
             createdAt: newOrder.createdAt,
           });
         }
@@ -187,7 +187,7 @@ const verifyPayment = async (req, res) => {
     const io = req.app.get("io");
     if (io) {
       order.shopOrder.forEach((shoporder) => {
-        console.log("shopOrder after io consition",shoporder)
+        console.log("shopOrder after io consition", shoporder);
         const ownerSocketId = shoporder.owner.socketId;
         if (ownerSocketId) {
           io.to(ownerSocketId).emit("newOrder", {

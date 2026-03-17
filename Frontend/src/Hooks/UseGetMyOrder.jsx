@@ -9,16 +9,15 @@ const UseGetMyOrders = () => {
   const dispatch =  useDispatch();
    useEffect(()=> {
       
-      const fetchShop = async() => {   
+      const fetchOrder = async() => {   
             const result = await axios.get("http://localhost:8000/api/order/my-orders",{withCredentials:true});
            
              if(!result){
                   console.log("resutl not found");
              }  
-             dispatch(addMyOrder(result.data))
-             dispatch(setMyorder(result.data))
+             dispatch(setMyorder( result.data))
       } 
-    fetchShop();
+    fetchOrder();
       
   },[])
 }

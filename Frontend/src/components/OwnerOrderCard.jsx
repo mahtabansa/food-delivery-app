@@ -36,8 +36,8 @@ const OwnerOrderCard = ({ data }) => {
       </div>
 
       {
-        data.shopOrder.map((shoporder, index) => (
-          <div key={index} className='shadow-md rounded-lg space-y-2'>
+        data.shopOrder.map((shoporder) => (
+          <div key={shoporder._id} className='shadow-md rounded-lg space-y-2'>
             <div className='flex space-x-4 overflow-x-auto pb-2'>
               {shoporder.shopOrderItems.map((item, index) => (
                 <div className='flex flex-start flex-col'>

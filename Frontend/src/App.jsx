@@ -25,13 +25,15 @@ import { DeliveryBoy } from './components/DeliveryBoy.jsx';
 import TrackOrderPage from './pages/TrackOrderPage.jsx';
 import Shop from './pages/Shop.jsx';
 import { useEffect } from 'react';
-import { setSocket } from './Redux/userSlice.js';
 import io from 'socket.io-client'
+import {socket} from './socket.js';
+import { addMyOrder } from './Redux/userSlice.js';
+import { setMyorder } from './Redux/userSlice.js';
 
 
 function App() {
   const dispatch = useDispatch();
-  const userData = useSelector((state) => state.user.userData);
+  const  userData = useSelector((state) => state.user.userData);
 
   useGetCuurentUser();
   console.log("userData", userData);
@@ -42,18 +44,45 @@ function App() {
   UseGetMyOrders();
   UseUpdateUserLocation();
 
-  useEffect(() => {
-    const socketInstance = io('http://localhost:8000', { withCredentials: true });
-    dispatch(setSocket(socketInstance));
-    socketInstance.on('connect', () => {
-      if (userData) socketInstance.emit('identity', { userId: userData._id });
-    })
 
-    console.log("socketInstance", socketInstance)
-     return ()=>{
-        socketInstance.disconnect();
-     }
-  }, [userData?._id])
+
+   useEffect(() => {
+  if (!socket || !userData?._id) return;
+
+  const handleConnect = () => {
+    socket.emit("identity", { userId: userData._id });
+  };
+
+  // Agar socket pehle se connected hai (refresh ke baad)
+  if (socket.connected) {
+    handleConnect();
+  }
+
+  // Event listener for connect
+  socket.on("connect", handleConnect);
+
+  return () => {
+    socket.off("connect", handleConnect);
+  };
+}, [userData, socket]); // Dono par depend karein
+
+
+//   useEffect(()=>{
+//   socket.on("newOrder",(data)=>{
+//     console.log("data  in the app.jsx",data)
+
+//     if(data?.shoporder?.owner._id === userData?._id){
+//     dispatch(setMyorder((prev)=>({
+//    ...prev,
+//    orders:[data,...prev.orders]
+// })))
+//     }
+//   })
+
+  // return ()=>{
+  //   socket.off("newOrder")
+  // }
+// },[userData])
 
 
   return (

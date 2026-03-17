@@ -74,13 +74,15 @@ const userSlice = createSlice({
         0,
       );
     },
+
+    addMyOrder: (state, action) => {
+        const newItems = action.payload;
+
+      state.Myorder.orders = [newItems, ...state.Myorder.orders];
+    },
     setMyorder: (state, actions) => {
       state.Myorder = actions.payload;
     },
-    addMyOrder: (state, actions) => {
-      state.Myorder = [actions.payload, state.Myorder];
-    },
-
     updateStatus: (state, action) => {
       const { orderId, shopId, status } = action.payload;
 
@@ -92,16 +94,16 @@ const userSlice = createSlice({
 
       shopOrder.status = status;
     },
-      clearUser: (state) => {
+    clearUser: (state) => {
       state.userData = null;
     },
 
-    setSearchItem:(state,action)=>{
-      state.SearchItem = action.payload
+    setSearchItem: (state, action) => {
+      state.SearchItem = action.payload;
     },
-    setSocket:(state,action)=>{
-      state.socket=action.payload
-    }
+    // setSocket:(state,action)=>{
+    //   state.socket=action.payload
+    // }
   },
 });
 export const {
@@ -120,7 +122,7 @@ export const {
   updateStatus,
   clearUser,
   setSearchItem,
-  setSocket
+  
 } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;

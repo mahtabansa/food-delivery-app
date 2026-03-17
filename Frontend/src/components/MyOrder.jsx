@@ -5,24 +5,36 @@ import { useDispatch, useSelector } from 'react-redux'
 import { OwnerOrderCard } from './OwnerOrderCard.jsx'
 import { UserOrderCard } from './UserOrderCard.jsx'
 import { setMyorder } from '../Redux/userSlice.js'
-
+import { socket } from '../socket.js'
+import { addMyOrder } from '../Redux/userSlice.js'
 
 const MyOrder = () => {
   const navigate = useNavigate()
-  const dispatch= useDispatch()
-  const { Myorder, userData,socket  } = useSelector((state) => state.user);
+  const dispatch = useDispatch()
+  const { Myorder, userData } = useSelector((state) => state.user);
   const orders = Myorder?.orders || [];
 
-  useEffect(()=>{
-        socket?.on('newOrder',(data)=>{
-          if(data?.shoporder?.owner._id===userData._id){
-            dispatch(setMyorder([data ,...MyOrder]))
-          }
-        })
-        return()=>{
-          socket.off('newOrder')
-        }
-  },[socket])
+useEffect(() => {
+ 
+  const handleNewOrder = (data) => {
+    console.log("New order received:", data);
+    
+
+     const ownerIdFromSocket = data?.shopOrder?.[0]?.owner._id; 
+
+  if (String(ownerIdFromSocket) === String(userData?._id)) {
+      dispatch(addMyOrder(data)); 
+    }
+  };
+
+  socket.on("newOrder", handleNewOrder);
+  // Cleanup: Jab component band ho, listener hata dein
+  return () => {
+    socket.off("newOrder", handleNewOrder);
+  };
+}, [dispatch, userData?._id]);
+
+
   return (
     <div className='w-full min-h-screen bg-[#fff9f6] flex  justify-center '>
       <div className='w-full max-w-[800px] p-4 '>
@@ -39,7 +51,7 @@ const MyOrder = () => {
             {orders.length === 0 ? (
               <p className="text-center text-gray-500">if order not shown then please refresh the page  </p>
             ) : (
-              orders.map((order) => (
+              orders?.map((order) => (
                 userData.role === "user"
                   ? <UserOrderCard data={order} key={order._id} />
                   : <OwnerOrderCard data={order} key={order._id} />

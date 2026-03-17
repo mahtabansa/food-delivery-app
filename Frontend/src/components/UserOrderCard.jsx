@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 // Data coming from MyOrderCard
 
 const UserOrderCard = ({ data }) => {
+  console.log("data in userOrder card",data)
  
   const navigate = useNavigate()
   console.log("data in user order card", data)

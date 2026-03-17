@@ -12,8 +12,6 @@ const UseUpdateUserLocation = () => {
 
     const updateLocation = async (lat, lng) => {
       try {
-        console.log("sending location:", lat, lng);
-
         await axios.post(
           "http://localhost:8000/api/user/update-location",
           { latitude: lat, longitude: lng },
@@ -39,8 +37,6 @@ const UseUpdateUserLocation = () => {
         }
       );
     }
-
-    // cleanup — very important
     return () => {
       if (watchId) navigator.geolocation.clearWatch(watchId);
     };
