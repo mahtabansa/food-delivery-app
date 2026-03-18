@@ -81,8 +81,8 @@ function OwnerDashboard() {
                         {myShopData?.items?.length > 0 &&
                         
                         <>
-                              {myShopData.items.map((data,key)=>(
-                                          <OwnerItemCard data={data} key={key}/>
+                              {myShopData.items.map((data)=>(
+                                          <OwnerItemCard data={data} key={data._id}/>
                               ))}
                               
                         </>

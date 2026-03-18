@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { OwnerOrderCard } from './OwnerOrderCard.jsx'
 import { UserOrderCard } from './UserOrderCard.jsx'
-import { setMyorder } from '../Redux/userSlice.js'
+import { setMyorder, updateRealTimeOrderStatus } from '../Redux/userSlice.js'
 import { socket } from '../socket.js'
 import { addMyOrder } from '../Redux/userSlice.js'
 
@@ -27,10 +27,22 @@ useEffect(() => {
     }
   };
 
+ 
+socket?.on('update-status',({orderId,shopId,status,userId})=>{
+     console.log("orderId,shopId,status,userId",orderId,shopId,status,userId);
+     if(userId===userData._id){
+      dispatch(updateRealTimeOrderStatus({orderId,shopId,status,userId}));
+     }
+
+})
+  
+
   socket.on("newOrder", handleNewOrder);
-  // Cleanup: Jab component band ho, listener hata dein
+ 
   return () => {
     socket.off("newOrder", handleNewOrder);
+        socket.off('update-status');
+
   };
 }, [dispatch, userData?._id]);
 

@@ -182,21 +182,22 @@ const verifyPayment = async (req, res) => {
 
     await order.populate("shopOrder.shopOrderItems.item", "name image price");
     await order.populate("shopOrder.shop", "name socketId");
-    await order.populate("user", "name email mobile");
+    await order.populate("user", "name email mobile socketId");
+        await order.populate("shopOrder.owner", "name socketId");
 
     const io = req.app.get("io");
-    if (io) {
+    if(io) {
       order.shopOrder.forEach((shoporder) => {
         console.log("shopOrder after io consition", shoporder);
         const ownerSocketId = shoporder.owner.socketId;
         if (ownerSocketId) {
           io.to(ownerSocketId).emit("newOrder", {
-            _id: assignment.order._id,
-            user: assignment.order.user,
-            payment: assignment.order.paymentMethod,
-            shopOrder: shoporder,
-            deliveryAddress: assignment.order.deliveryAddress,
-            createdAt: assignment.order.createdAt,
+            _id: order._id,
+            user:order.user,
+            payment:order.paymentMethod,
+            shopOrder: [shoporder],
+            deliveryAddress:order.deliveryAddress,
+            createdAt:order.createdAt,
           });
         }
       });
@@ -261,7 +262,7 @@ const updateorderStatus = async (req, res) => {
     shopOrder.status = status;
     let deliveryBoysPayload = [];
 
-    if (status === "out of delivery" && !shopOrder.assignment) {
+    if (status==="out of delivery" && !shopOrder.assignment) {
       const { longitude, latitude } = order;
 
       const nearByDeliveryBoys = await User.find({
@@ -298,9 +299,9 @@ const updateorderStatus = async (req, res) => {
       }
 
       const deliveryAssignment = await DeliveryAssignment.create({
-        order: order._id,
-        shop: shopOrder.shop,
-        shopOrderId: shopOrder._id,
+        order: order?._id,
+        shop: shopOrder?.shop,
+        shopOrderId: shopOrder?._id,
         broadCastedTo: candidates,
         status: "broadcasted",
       });
@@ -314,19 +315,66 @@ const updateorderStatus = async (req, res) => {
         latitude: b.location.coordinates?.[1],
         mobile: b.mobile,
       }));
+     await deliveryAssignment.populate('order');
+    await  deliveryAssignment.populate('order.deliveryAddress','deliveryAddress');
+    await  deliveryAssignment.populate('shop' ,'name')
+    await  deliveryAssignment.populate('order.shopOrder' ,'assignment')
+
+     const io = req.app.get('io');
+     if(io){
+      availableDeliveryBoys.forEach((boy)=>{
+        const boySocketid = boy?.socketId;
+        if(boySocketid){
+          io.to(boySocketid).emit('newAssignment',{
+            sentTo:boy?._id,
+            assignmentId:deliveryAssignment._id,
+            orderId:deliveryAssignment.order._id,
+            shopName:deliveryAssignment?.shop?.name,
+            deliveryAddress:deliveryAssignment?.order?.deliveryAddress,
+             items:deliveryAssignment?.order?.shopOrder?.find(so=>so._id.equals(deliveryAssignment.shopOrderId)?.shopOrderItems || []),
+            // subtotal:deliveryAssignment.order.shopOrder.find(so=>so._id.equals(deliveryAssignment.shopOrderId)?.subtotal) 
+            subtotal:deliveryAssignment?.order?.totalAmount
+
+          })
+        }
+      })
+     }
+
+
+
+
+
     }
 
     await order.save();
-
+    const updatedShopOrder = order.shopOrder.find((o) =>
+      o.shop._id.equals(shopId),
+    );
     await order.populate("shopOrder.shop", "name");
     await order.populate(
       "shopOrder.assignedDeliveryBoy",
       "fullName email mobile",
     );
-
-    const updatedShopOrder = order.shopOrder.find((o) =>
-      o.shop._id.equals(shopId),
+       await order.populate(
+      "user",
+      "socketId",
     );
+
+   const io = req.app.get("io"); 
+
+    if(io) {
+      
+        const userSocketId = order.user.socketId;
+        if (userSocketId) {
+          io.to(userSocketId).emit('update-status', {
+            orderId:order?._id,
+            shopId:updatedShopOrder.shop?._id,
+            status:updatedShopOrder.status,
+            userId:order?.user?._id,
+       
+        })
+      };
+    }
 
     return res.status(200).json({
       shopOrder: updatedShopOrder,
@@ -344,6 +392,7 @@ export { updateorderStatus };
 const getDeliveryBoyAssignment = async (req, res) => {
   try {
     const DeliveryboyId = req.userId;
+    console.log("get delivery boy asssigment",DeliveryboyId);
 
     const assignments = await DeliveryAssignment.find({
       broadCastedTo: DeliveryboyId,
@@ -351,7 +400,7 @@ const getDeliveryBoyAssignment = async (req, res) => {
     })
       .populate("order")
       .populate("shop");
-
+      console.log("assignments",assignments)
     const formatted = assignments.map((a) => {
       const shopOrderItem = a.order.shopOrder.find((so) =>
         so._id.equals(a.shopOrderId),
@@ -383,7 +432,7 @@ const acceptOrder = async (req, res) => {
   const assignment = await DeliveryAssignment.findById(assignmentId);
 
   if (!assignment) {
-    return res.status(500).json({ message: "asignment not found " });
+    return res.status(500).json({ message: "assignment not found " });
   }
 
   if (assignment.status !== "broadcasted") {
@@ -417,6 +466,8 @@ const acceptOrder = async (req, res) => {
   );
 
   shopOrder.assignedDeliveryBoy = req.userId;
+
+
   await order.save();
   console.log("order", order);
   return res.status(200).json({ message: "order accepted" });

@@ -16,8 +16,8 @@ const userSlice = createSlice({
     Myorder: {
       orders: [],
     },
-    SearchItem:null,
-    socket:null,
+    SearchItem: null,
+    // socket:null,
   },
   reducers: {
     setUserData: (state, actions) => {
@@ -94,6 +94,21 @@ const userSlice = createSlice({
 
       shopOrder.status = status;
     },
+    updateRealTimeOrderStatus:(state,action)=>{
+      const {orderId,shopId,status,userId} = action.payload;
+           console.log("orderId,shopId,status,userId in userSlice broo hee",orderId,shopId,status,userId);
+      const order =state.Myorder.orders.find(o=>o._id===orderId);
+
+           console.log("state.Myorder.orders",order);
+
+      if(order){
+        const shopOrder = order.shopOrder.find(so=>so?.shop?._id===shopId);
+        if(shopOrder){
+          shopOrder.status=status
+        }
+      }
+
+    },
     clearUser: (state) => {
       state.userData = null;
     },
@@ -101,9 +116,8 @@ const userSlice = createSlice({
     setSearchItem: (state, action) => {
       state.SearchItem = action.payload;
     },
-    // setSocket:(state,action)=>{
-    //   state.socket=action.payload
-    // }
+
+ 
   },
 });
 export const {
@@ -122,7 +136,7 @@ export const {
   updateStatus,
   clearUser,
   setSearchItem,
-  
+  updateRealTimeOrderStatus
 } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;

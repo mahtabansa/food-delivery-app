@@ -22,7 +22,7 @@ const OwnerOrderCard = ({ data }) => {
   }
 
   return (
-    <div className='bg-white p-4 shadow-6 shadow-lg space-y-6 '>
+    <div className='bg-white p-4 shadow-6 shadow-lg space-y-6 ' key={data._id}>
       <div className='flex flex-col justify-center'>
         <h1 className='text-md font-bold text-gray-600'>User Name . : {data?.user?.fullName}</h1>
 
@@ -39,9 +39,9 @@ const OwnerOrderCard = ({ data }) => {
         data.shopOrder.map((shoporder) => (
           <div key={shoporder._id} className='shadow-md rounded-lg space-y-2'>
             <div className='flex space-x-4 overflow-x-auto pb-2'>
-              {shoporder.shopOrderItems.map((item, index) => (
-                <div className='flex flex-start flex-col'>
-                  <div key={index} className=' flex  flex-col rounded-lg p-2 bg-white gap-2'>
+              {shoporder.shopOrderItems.map((item) => (
+                <div className='flex flex-start flex-col' key={item._id}>
+                  <div className=' flex  flex-col rounded-lg p-2 bg-white gap-2'>
                     <img src={item.item.image} alt={item.item.name} className='h-20 rounded-md object-cover' />
                     <p className='text-md font-bold text-gray-600'>Food Name: {item?.item.name}</p>
                     <p className='text-md font-bold text-gray-600'>Food Type: {data?.shopOrder[0].shopOrderItems[0].foodType}</p>

@@ -111,7 +111,6 @@ const CheckOut = () => {
                               
                                navigate("/order-placed");
                            
-                             
                         } else {
                               console.log("const orderId = res.data.order.orderId:", res.data.orderId);
                               console.log("const razorOrder = res.data.order.razorOrder", res.data.razorOrder);
@@ -119,9 +118,6 @@ const CheckOut = () => {
                               const razorOrder = res.data.razorOrder;
                               openRazorPayWindow(orderId, razorOrder)
                         }
-
-
-
                   })
                   .catch(err => {
                         console.error("Error placing order:", err);
