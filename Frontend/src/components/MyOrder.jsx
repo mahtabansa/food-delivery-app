@@ -29,7 +29,6 @@ useEffect(() => {
 
  
 socket?.on('update-status',({orderId,shopId,status,userId})=>{
-     console.log("orderId,shopId,status,userId",orderId,shopId,status,userId);
      if(userId===userData._id){
       dispatch(updateRealTimeOrderStatus({orderId,shopId,status,userId}));
      }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { FaLeaf } from "react-icons/fa";
-import { FaDrumstickBite, FaStar } from "react-icons/fa6";
-
+import { FaDrumstickBite } from "react-icons/fa6";
+ import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 import { GoStarFill } from "react-icons/go";
 
 import { FaMinus } from "react-icons/fa";
@@ -16,18 +16,32 @@ const FoodCard = ({ data }) => {
   const dispatch = useDispatch();
   const { CardItems } = useSelector((state) => state.user);
 
-  const renderStar = (rating) => {
-    const stars = [];
+ 
 
-    for (let i = 1; i <= 5; i++) {
+const renderStar = () => {
+  const rating = data.rating.average || 0;
+  const totalStars = 5;
 
-      stars.push(
-        (i <= rating) ? <GoStarFill className='text-yellow-500 text-lg' /> : <FaStar className='text-yellow-500 text-lg' />
-      )
+  let starArray = [];
 
+  for (let i = 1; i <= totalStars; i++) {
+    if (i <= Math.floor(rating)) {
+      starArray.push(
+        <FaStar key={i} className="text-yellow-500 text-lg" />
+      );
+    } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+      starArray.push(
+        <FaStarHalfAlt key={i} className="text-yellow-500 text-lg" />
+      );
+    } else {
+      starArray.push(
+        <FaRegStar key={i} className="text-gray-300 text-lg" />
+      );
     }
-    return stars;
   }
+
+  return starArray;
+};
   const isInCart = CardItems.some(i => i._id === data._id)
   const handleIncrease = () => {
     const newQnt = quantity + 1;

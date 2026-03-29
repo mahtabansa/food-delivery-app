@@ -47,7 +47,7 @@ const CheckOut = () => {
       const getaddressByLatLog = async (lat, log) => {
             try {
 
-                  const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${log}&type=postcode&format=json&apiKey=${apikey}`);
+                  const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${log}&type=postcode&format=json&apiKey=${apikey}` ,{withCredentials:true});
                   const result = response.data.results[0].address_line1 || response.data.results[0].city;
 
                   const fullAddress = response.data.results[0].address_line2 + " " + response.data.results[0].address_line1 + " " + " " + response.data.results[0].state + " " + response.data.results[0].country
@@ -73,7 +73,7 @@ const CheckOut = () => {
       const getlatlogByAddress = async () => {
             try {
 
-                  const response = fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(addressInput)}&apiKey=${apikey}`)
+                  const response = fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(addressInput)}&apiKey=${apikey}` ,{withCredentials:true})
                         .then(resp => resp.json())
                         .then((geocodingResult) => {
                               console.log("Geocoding Result:", geocodingResult);

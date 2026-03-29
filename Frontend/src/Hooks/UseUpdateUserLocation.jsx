@@ -1,9 +1,11 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-
+import { socket } from "../socket.js";
 const UseUpdateUserLocation = () => {
   const { userData } = useSelector((state) => state.user);
+
+  const lastCallTime = useRef(0);
 
   useEffect(() => {
     if (!userData) return;
@@ -11,17 +13,24 @@ const UseUpdateUserLocation = () => {
     let watchId;
 
     const updateLocation = async (lat, lng) => {
-      try {
-       
-        await axios.post(
-          "http://localhost:8000/api/user/update-location",
-          { latitude: lat, longitude: lng },
-          { withCredentials: true }
-        );
+      const now = Date.now();
 
-      } catch (err) {
-        console.log("location update error", err.message);
-      }
+      // 🔥 throttle (3 sec)
+      if (now - lastCallTime.current < 3000) return;
+
+      lastCallTime.current = now;
+      socket.on('updateLocation', async ({ userId, longitude, latitude }) => {
+        try {
+          await axios.post(
+            "http://localhost:8000/api/user/update-location",
+            { latitude: lat || latitude, longitude: lng || longitude},
+            { withCredentials: true }
+          );
+        } catch (err) {
+          console.log("location update error", err.message);
+        }
+      })
+
     };
 
     if (navigator.geolocation) {
@@ -33,17 +42,15 @@ const UseUpdateUserLocation = () => {
         (err) => console.log("location error:", err.message),
         {
           enableHighAccuracy: true,
-          maximumAge: 0,
+          maximumAge: 5000,
           timeout: 10000,
         }
       );
     }
 
-    // cleanup — very important
     return () => {
       if (watchId) navigator.geolocation.clearWatch(watchId);
     };
-
   }, [userData?._id]);
 };
 

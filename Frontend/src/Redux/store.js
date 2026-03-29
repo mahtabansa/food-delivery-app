@@ -1,7 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
 
-// export default store
-
 import  {userReducer} from './userSlice.js'  // Correct!
 import  {ownerReducer}  from './ownerSlice.js'
 import {mapReducer} from './mapSlice.js'

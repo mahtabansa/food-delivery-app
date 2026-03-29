@@ -6,6 +6,8 @@ import home from '../assets/home.png'
 import { MapContainer ,Marker, Polyline } from 'react-leaflet';
 import { TileLayer } from 'react-leaflet';
 import { Popup } from 'react-leaflet';
+import { useEffect } from 'react';
+
 const deliveryBoyIcon = new L.icon({
       iconUrl:scooter,
       iconSize:[40 , 40],
@@ -19,19 +21,24 @@ const CustomerIcon  = new L.icon({
       iconAnchor:[20 ,40]
 })
 export const DeliveryBoyTracking = ({data}) => {
-
-      const customerlat = data?.data?.customerLocation?.lat ||  data?.customerLocation?.lat ; 
-      const customerlong = data?.data?.customerLocation?.long || data?.customerLocation?.lon;
-
-      const  deliveryBoyLat = data?.data?.deliveryBoyLocation?.lat || data?.deliveryBoyLocation?.lat;
-      const  deliveryBoylong = data?.data?.deliveryBoyLocation?.long || data?.deliveryBoyLocation?.lon;
-
+      console.log("data in track",data)
+   
+      const customerlat = data?.data?.customerLocation?.lat ??  data?.customerLocation?.lat  ; 
+      const customerlong = data?.data?.customerLocation?.long ?? data?.customerLocation?.lon;
+      console.log("customerlat",customerlat)
+      console.log("customerlong",customerlong);
+      const  deliveryBoyLat = data?.data?.deliveryBoyLocation?.lat ?? data?.deliveryBoyLocation?.lat;
+      const  deliveryBoylong = data?.data?.deliveryBoyLocation?.long ?? data?.deliveryBoyLocation?.lon;
+       console.log("deliveryBoyLat",deliveryBoyLat);
+       console.log("deliveryBoylong",deliveryBoylong);
       const path = [
             [deliveryBoyLat ,deliveryBoylong],
             [customerlat ,customerlong]
       ]
 
       const center = [deliveryBoyLat ,deliveryBoylong]
+
+      
   return (
       <div className='rounded-lg bg-gray-100 py-2 '>
                                   <div className='h-60 w-full '>

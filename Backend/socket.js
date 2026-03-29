@@ -20,16 +20,19 @@ const socketHandler = (io) => {
       }
     });
 
-    socket.on("updateLocation", async ({ userId, longitude, latitude }) => {
+    socket.on('updateLocation', async ({ userId, longitude, latitude }) => {
       try {
         if (!userId) {
           return;
         }
+        console.log("userId, longitude, latitude socket ",userId, longitude, latitude);
         const user = await User.findByIdAndUpdate(userId, {
-          location: { type: "Point", coordinate: [longitude, latitude] },
+        location: { type: "Point", coordinates: [longitude, latitude] },
           isOnline: true,
           socketId: socket.socket_id,
         });
+
+        console.log("user in scoket",user)
         if(user) {
           io.emit("updateDeliveryLocation", { deliveryBoyId:userId, longitude, latitude });
         }

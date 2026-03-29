@@ -3,7 +3,7 @@ import Navbar from './Navbar.jsx'
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { data } from 'react-router-dom';
+import { data, Navigate, useNavigate } from 'react-router-dom';
 import { DeliveryBoyTracking } from '../pages/DeliveryBoyTracking.jsx';
 import { socket } from '../socket.js';
 import { Fragment } from 'react';
@@ -13,35 +13,36 @@ function DeliveryBoy() {
       const [currentOrder, setCurrentOrder] = useState();
       const [showOtpBox, setshowOtpBox] = useState(false);
       const [deliveryotp, setdeliveryotp] = useState("");
-
+      const [deliveryBoyLocation ,setDeliveryBoyLocation] = useState({});
+      const [todaysDeliveries,setTodaysDelieries ] = useState([]);
+      const navigate = useNavigate();
       console.log("currentOrder", currentOrder);
       console.log("availableAssignments", availableAssignments);
 
 
-useEffect(()=> {
-            if(userData.role !=="deliveryBoy" || !socket) return;
+      useEffect(() => {
+            if (userData?.role !== "deliveryBoy" || !socket) return;
             let watchId;
-            if(navigator.geolocation){
-               watchId =   navigator.geolocation.watchPosition((position)=>{
+            if (navigator.geolocation) {
+                  watchId = navigator.geolocation.watchPosition((position) => {
+                       
                         let latitude = position.coords.latitude;
                         let longitude = position.coords.longitude;
-                        socket.emit('updateLocation',{userId:userData._id,latitude,longitude})
+                         setDeliveryBoyLocation({lat:latitude,lon:longitude});
+                        socket?.emit('updateLocation', { userId: userData?._id, latitude, longitude })
 
                   }),
-                  (errr)=>{
-                        console.log(errr)
-                  },
-                 {enableHighAccurecy:true}
-                  
+                        (errr) => {
+                              console.log(errr)
+                        },
+                        { enableHighAccurecy: true }
+
             }
 
-            return()=>{
-                  if(watchId) navigator.geolocation.clearWatch(watchId);
+            return () => {
+                  if (watchId) navigator.geolocation.clearWatch(watchId);
             }
-},[socket,userData])
-
-
-
+      }, [socket, userData])
 
       const getAssignment = async () => {
             try {
@@ -66,7 +67,6 @@ useEffect(()=> {
                   console.log("data in the delivery boy socket listener", data)
                   setAvailableAssignment((prev) => [...prev, data])
             }
-
             socket?.on("newAssignment", handler)
 
             return () => {
@@ -74,22 +74,16 @@ useEffect(()=> {
             }
       }, [socket, userData])
 
-      useEffect(() => {
-            getAssignment()
-            getCurrentOrder()
-      }, [userData]
-      )
-
       const acceptOrder = async (assignmentId) => {
             console.log("assignmentId in frontend", assignmentId)
             try {
                   const result = await axios.get(`http://localhost:8000/api/order/accept-order/${assignmentId}`, { withCredentials: true });
                   console.log("result", result)
+                  navigate('/')
             } catch (err) {
                   console.log(`error while accept order ${err}`)
             }
       }
-
 
       const sendotp = async () => {
 
@@ -97,8 +91,8 @@ useEffect(()=> {
                   const result = await axios.post("http://localhost:8000/api/order/send-delivery-otp",
                         { shopOrderId: currentOrder.data.shopOrder._id, orderId: currentOrder.data._id }, { withCredentials: true });
                   console.log("result", result)
-                  if (result) {
-                        setshowOtpBox(true)
+                  if (result?.data) {
+                        setshowOtpBox(true);
                   }
 
             } catch (err) {
@@ -106,19 +100,39 @@ useEffect(()=> {
             }
       }
 
-
       const handleVerifyotp = async () => {
 
             try {
                   const result = await axios.post(`http://localhost:8000/api/order/verify-delivery-otp`,
                         { shopOrderId: currentOrder.data.shopOrder._id, orderId: currentOrder.data._id, otp: deliveryotp }, { withCredentials: true });
                   console.log("result", result)
+                  if (result.data) {
+                        navigate('/')
+                  }
 
 
             } catch (err) {
                   console.log(`error while send otp ${err}`)
             }
       }
+       const getTodayDeliviries = async () => {
+  
+            try {
+                  const result = await axios.get(`http://localhost:8000/api/order/get-todays-deliveries`,
+                      { withCredentials: true });
+                  console.log("result for today deliveries", result.data);
+                setTodaysDelieries(result.data);
+
+            } catch (err) {
+                  console.log(`error while getTodayDeliveries ${err}`)
+            }
+      }
+           useEffect(() => {
+            getAssignment()
+            getCurrentOrder()
+           getTodayDeliviries();
+      }, [userData ,currentOrder]
+      )
       return (
             <div className="flex  flex-col w-screen min-h-screen gap-5 items-center bg-[#fff9f6] overflow-y-auto">
                   <Navbar />
@@ -135,7 +149,7 @@ useEffect(()=> {
                                     <h1 className='text-2xl font-bold'>Available Orders</h1>
                                     {availableAssignments?.length > 0 ? availableAssignments.map((order) => (
 
-                                          <div className='bg-white w-[90%] border border-orange-100 rounded-lg gap-2 flex flex-col p-3' key={availableAssignments?._id}>
+                                          <div key={availableAssignments?._id} className='bg-white w-[90%] border border-orange-100 rounded-lg gap-2 flex flex-col p-3' >
 
                                                 <span className='text-xl font-bold text-gray-700'>{order?.shopName}</span>
                                                 <div className='flex justify-between'>
@@ -148,7 +162,6 @@ useEffect(()=> {
                                                 <span className='text-gray-500'>{order?.items?.length} item | {order?.
                                                       subtotal
                                                 } ₹</span>
-
 
                                           </div>
                                     ))
@@ -167,7 +180,16 @@ useEffect(()=> {
                                           <p className='text-sm  font-bold'>{currentOrder?.data?.deliveryAddress}</p>
 
                                     </div>
-                                    <DeliveryBoyTracking data={currentOrder} key={data._id} />
+                                    <DeliveryBoyTracking data={{
+                                          deliveryBoyLocation:  deliveryBoyLocation || {
+                                                lat:currentOrder?.data?.deliveryBoyLocation.lat,
+                                                lon:currentOrder?.data?.deliveryBoyLocation.long,
+                                          },
+                                          customerLocation: {
+                                                lat: currentOrder?.data?.customerLocation?.lat,
+                                                lon: currentOrder?.data?.customerLocation?.long,
+                                          },
+                                    }} key={data._id} />
                                     {!showOtpBox ? <div className='w-[100%]'>
                                           <button className='w-full  bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition-all duration-200 text-white py-2 active:scale-95' onClick={sendotp}>Mark As delivered</button>
                                     </div> :
@@ -178,8 +200,6 @@ useEffect(()=> {
                                                 <button className='w-full  bg-orange-500  rounded-lg font-semibold transition-all duration-200 text-white py-2' onClick={handleVerifyotp}>SUBMIT OTP</button>
                                           </div>
                                     }
-
-
 
 
                               </div>

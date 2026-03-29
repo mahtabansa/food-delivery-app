@@ -5,7 +5,6 @@ import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ForgotPassword from './pages/ForgotPassword';
-import Navbar from './components/Navbar.jsx'
 import Home from './pages/Home.jsx';
 import UseGetCurrentCity from './Hooks/UseGetCurrentCity.jsx';
 import useGetMyShop from './Hooks/useGetMyShop.jsx';
