@@ -56,6 +56,7 @@ const EditItem = async (req, res) => {
       updateData,
       { name, category, foodType, price },
       { new: true },
+      "",
     );
 
     if (!item) {
@@ -128,10 +129,11 @@ const getItemBycity = async (req, res) => {
     const { city } = req.params;
     if (!city) return res.status(400).json({ message: "city required" });
 
-    const shops = await Shop.find({
-      city: { $regex: `^${city}$`, $options: "i" },
-    }).populate("items");
+    const cleanCity = city.trim();
 
+    const shops = await Shop.find({
+      city: { $regex: `^${cleanCity}$`, $options: "i" },
+    }).populate("items");
     if (shops.length === 0) {
       return res.status(404).json({ message: "shop not found" });
     }
@@ -148,6 +150,7 @@ const getItemBycity = async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 };
+
 export { getItemBycity };
 
 const getItemsByShopId = async (req, res) => {
@@ -166,7 +169,7 @@ const getItemsByShopId = async (req, res) => {
       items: shop.items,
     });
   } catch (err) {
-    console.log(err); 
+    console.log(err);
     return res.status(500).json({
       message: "error occurred while getting shop items",
       err,
@@ -180,7 +183,7 @@ const searchItems = async (req, res) => {
     const { query, city } = req.query;
     if (!query || !city) return;
     const searchShops = await Shop.find({
-      city: { $regex: city, $options: "i" }, 
+      city: { $regex: city, $options: "i" },
     }).populate("items");
 
     if (searchShops.length == 0) {
@@ -219,31 +222,29 @@ const searchItems = async (req, res) => {
 };
 export { searchItems };
 
-const itemRating = async(req,res)=> {
-try
-{
-  const {itemId,rating} = req.body;
-  if(!itemId || !rating){
-   return res.status(500).json({message:`item and rating is reqired`})
+const itemRating = async (req, res) => {
+  try {
+    const { itemId, rating } = req.body;
+    if (!itemId || !rating) {
+      return res.status(500).json({ message: `item and rating is reqired` });
+    }
+    if (rating < 1 || rating > 5) {
+      return res.status(500).json({ message: `rating must be between 1 to 5` });
+    }
+    const item = await Item.findById(itemId);
+    if (!item) {
+      return res.status(400).json({ message: "item not found " });
+    }
+    const newCount = item.rating.count + 1;
+    const newAverage =
+      (item.rating.average * item.rating.count + rating) / newCount;
+    item.rating.count = newCount;
+    item.rating.average = newAverage;
+    await item.save();
+    return res.status(200).json({ rating: item.rating });
+  } catch (err) {
+    console.log(`error occured while ratings${err}`);
   }
-   if(rating < 1 || rating>5){
-   return res.status(500).json({message:`rating must be between 1 to 5`})
-  }
-const item = await Item.findById(itemId);
-  if(!item){
-    return res.status(400).json({message:"item not found "})
-  }
-  const newCount = item.rating.count+1;
-  const newAverage = (item.rating.average * item.rating.count +rating)/newCount 
-   item.rating.count = newCount;
-   item.rating.average= newAverage;
-await item.save();
-return res.status(200).json({rating:item.rating});
-}
+};
 
-catch(err){
- console.log(`error occured while ratings${err}`)
-}
-}
-
-export {itemRating} 
+export { itemRating };

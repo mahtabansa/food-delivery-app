@@ -2,7 +2,6 @@ import UploadOnCloudinary from "../utils/cloudinary.js";
 import { Shop } from "../models/shop.model.js";
 import { Item } from "../models/item.model.js";
 
-/// error in this and getshop route
 const createEditShop = async (req, res) => {
   try {
     const { name, state, city, address } = req.body;
