@@ -21,7 +21,7 @@ const AddItem = () => {
       const [category, setCategory] = useState("");
       const [foodType, setFoodType] = useState("");
       const [Loading, setLoading] = useState(false);
-
+ const url = import.meta.env.VITE_SERVER_URL;
 
       const categories = [
             "Snacks",
@@ -68,7 +68,7 @@ const AddItem = () => {
 
 
                   const result = await axios.post(
-                        "http://localhost:8000/api/item/add-item",
+                        `${url}/api/item/add-item`,
                         formData,
                         {
                               withCredentials: true

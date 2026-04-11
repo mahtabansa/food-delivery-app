@@ -5,12 +5,12 @@ import { addMyOrder, setMyorder } from '../Redux/userSlice.js'
 
 
 const UseGetMyOrders = () => {
-
+ const url = import.meta.env.VITE_SERVER_URL;
   const dispatch =  useDispatch();
    useEffect(()=> {
       
       const fetchOrder = async() => {   
-            const result = await axios.get("http://localhost:8000/api/order/my-orders",{withCredentials:true});
+            const result = await axios.get(`${url}/api/order/my-orders`,{withCredentials:true});
            
              if(!result){
                   console.log("resutl not found");

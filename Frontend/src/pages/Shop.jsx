@@ -10,10 +10,12 @@ const Shop = () => {
       const [itemsInMyshop, setItemsInMyshop] = useState([]);
       const [shop, setShop] = useState([]);
       const { shopId } = useParams();
+       const url = import.meta.env.VITE_SERVER_URL;
+
 
       const handleGetItems = async () => {
             try {
-                  const result = await axios.get(`http://localhost:8000/api/item/get-items-by-ShopId/${shopId}`, { withCredentials: true });
+                  const result = await axios.get(`${url}/api/item/get-items-by-ShopId/${shopId}`, { withCredentials: true });
                   console.log("Items", result)
                   setItemsInMyshop(result?.data.items)
                   setShop(result.data.shop)

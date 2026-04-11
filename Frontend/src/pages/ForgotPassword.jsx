@@ -11,6 +11,7 @@ export default function ForgotPassword() {
       const [confirmPassword, setConfirmPassword] = useState("");
       const [error, setError] = useState("");
       let navigate = useNavigate();
+        const url = import.meta.env.VITE_SERVER_URL;
 
       const handlesendOtp = async (event) => {
             if (!email) {
@@ -19,7 +20,7 @@ export default function ForgotPassword() {
             }
             try {
                   const response = await axios.post(
-                        'http://localhost:8000/api/auth/send-otp',
+                        `${url}/api/auth/send-otp`,
                         { email },
                         {
                               withCredentials: true,
@@ -42,7 +43,7 @@ export default function ForgotPassword() {
                   setError("Please provide otp ");
             }
             try {
-                  const result = await axios.post('http://localhost:8000/api/auth/verify-otp', { email, otp },
+                  const result = await axios.post(`${url}/api/auth/verify-otp`, { email, otp },
                         {
                               withCredentials: true,
                               headers: {
@@ -65,7 +66,7 @@ export default function ForgotPassword() {
 
             }
             try {
-                  const result = await axios.post('http://localhost:8000/api/auth/reset-password', { email, newPassword },
+                  const result = await axios.post(`{url}/api/auth/reset-password`, { email, newPassword },
                         {
                               withCredentials: true,
                               headers: {

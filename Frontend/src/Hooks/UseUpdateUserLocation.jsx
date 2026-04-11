@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { socket } from "../socket.js";
 const UseUpdateUserLocation = () => {
   const { userData } = useSelector((state) => state.user);
-
+ const url = import.meta.env.VITE_SERVER_URL;
   const lastCallTime = useRef(0);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const UseUpdateUserLocation = () => {
       socket.on('updateLocation', async ({ userId, longitude, latitude }) => {
         try {
           await axios.post(
-            "http://localhost:8000/api/user/update-location",
+            `${url}/api/user/update-location`,
             { latitude: lat || latitude, longitude: lng || longitude},
             { withCredentials: true }
           );

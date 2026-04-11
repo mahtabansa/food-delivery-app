@@ -116,9 +116,12 @@ function DeliveryBoy() {
             }
       }
        const getTodayDeliviries = async () => {
-  
+          const url = import.meta.env.VITE_SERVER_URL;
+          const frontend = import.meta.env.VITE_FRONTEND_URL;
+          console.log("frontend url",frontend);
+          console.log("url",url)
             try {
-                  const result = await axios.get(`http://localhost:8000/api/order/get-todays-deliveries`,
+                  const result = await axios.get(`${url}/api/order/get-todays-deliveries`,
                       { withCredentials: true });
                   console.log("result for today deliveries", result.data);
                 setTodaysDelieries(result.data);

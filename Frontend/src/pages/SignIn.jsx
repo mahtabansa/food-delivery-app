@@ -26,6 +26,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [loader, setloader] = useState(false);
   const dispatch = useDispatch();
+        const url = import.meta.env.VITE_SERVER_URL;
 
 
   const handleSignIn = async (event) => {
@@ -37,7 +38,7 @@ export default function SignIn() {
     try {
       setloader(true);
 
-      const response = await axios.post(`${serverUrl}/api/auth/signin`,
+      const response = await axios.post(`${url}/api/auth/signin`,
         { email, password }, { withCredentials: true })
 
       if (response.data) {
@@ -66,7 +67,7 @@ export default function SignIn() {
     try {
 
 
-      let { data } = await axios.post("http://localhost:8000/api/auth/google-auth",
+      let { data } = await axios.post(`${url}/api/auth/google-auth`,
         {
           email
 

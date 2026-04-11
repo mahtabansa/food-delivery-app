@@ -20,14 +20,10 @@ import OrderPlaced from './pages/OrderPlaced.jsx';
 import MyOrder from './components/MyOrder.jsx';
 import UseGetMyOrders from './Hooks/UseGetMyOrder.jsx';
 import { UseUpdateUserLocation } from './Hooks/useUpdateUserLocation.jsx';
-import { DeliveryBoy } from './components/DeliveryBoy.jsx';
 import TrackOrderPage from './pages/TrackOrderPage.jsx';
 import Shop from './pages/Shop.jsx';
 import { useEffect } from 'react';
-import io from 'socket.io-client'
 import {socket} from './socket.js';
-import { addMyOrder } from './Redux/userSlice.js';
-import { setMyorder } from './Redux/userSlice.js';
 
 
 function App() {

@@ -7,7 +7,7 @@ function useGetCurrentUser() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const fetched = useRef(false); // strict mode double call fix
-
+ const url = import.meta.env.VITE_SERVER_URL;
   useEffect(() => {
     if (fetched.current) return;
     fetched.current = true;
@@ -15,7 +15,7 @@ function useGetCurrentUser() {
     const fetchUser = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:8000/api/user/current_user",
+          `${url}/api/user/current_user`,
           { withCredentials: true }
         );
 

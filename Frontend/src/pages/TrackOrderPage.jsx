@@ -8,16 +8,16 @@ import { socket } from '../socket.js';
 const TrackOrderPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-
+    const url = import.meta.env.VITE_SERVER_URL;
   const [currentOrder, setCurrentOrder] = useState();
   console.log("current order",currentOrder);
   const [deliveryLiveLocation, setDeliveryLiveLocation] = useState({});
  
-  // ── Fetch order ──────────────────────────────────────────────────────────────
+  // ── Fetch order 
   const handleGetOrder = async () => {
     try {
       const result = await axios.get(
-        `http://localhost:8000/api/order/get-order-by-id/${orderId}`,
+        `${url}/api/order/get-order-by-id/${orderId}`,
         { withCredentials: true }
       );
       setCurrentOrder(result.data);
@@ -26,7 +26,7 @@ const TrackOrderPage = () => {
     }
   };
  
-  // ── Socket.io — live delivery-boy location ────────────────────────────────
+ 
   useEffect(() => {
     const handler = ({ deliveryBoyId, longitude, latitude }) => {
       setDeliveryLiveLocation((prev) => ({
@@ -39,12 +39,12 @@ const TrackOrderPage = () => {
     return () => socket?.off('updateDeliveryLocation', handler);
   }, [socket]);
  
-  // ── Load order on mount / id change ──────────────────────────────────────
+  
   useEffect(() => {
     handleGetOrder();
   }, [orderId]);
  
-  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
     <div className='max-w-4xl p-4 mx-auto flex flex-col gap-6'>
  

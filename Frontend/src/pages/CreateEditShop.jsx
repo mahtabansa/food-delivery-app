@@ -8,7 +8,6 @@ import { useState } from 'react';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners';
 
-
 const CreateEditShop = () => {
       const navigate = useNavigate();
       const dispatch = useDispatch();
@@ -22,6 +21,7 @@ const CreateEditShop = () => {
       const [BackendImage, setBackendImage] = useState(null);
       const [FrontendImage, setFrontendImage] = useState(myShopData?.image || null);
       const [loading,setLoading] = useState(false);
+        const url = import.meta.env.VITE_SERVER_URL;
 
 
       const handleImage = (e) => {
@@ -54,7 +54,7 @@ const CreateEditShop = () => {
                   }
 
                   const result = await axios.post(
-                        "http://localhost:8000/api/shop/create-edit-shop",
+                        `${url}/api/shop/create-edit-shop`,
                         formData,
                         {
                               withCredentials: true

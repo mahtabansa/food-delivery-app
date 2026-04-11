@@ -34,6 +34,7 @@ const CheckOut = () => {
       const { location, address } = useSelector(state => state.map);
       const [addressInput, setAddressInput] = useState(address || '');
       const [paymentMethod, setPaymentMethod] = useState("cod");
+        const url = import.meta.env.VITE_SERVER_URL;
 
       const deliveryfees = TotalAmount > 500 ? 0 : 40;
 
@@ -90,7 +91,7 @@ const CheckOut = () => {
 
 
       const handlePlaceOrder = async () => {
-            await axios.post("http://localhost:8000/api/order/place-order", {
+            await axios.post(`${url}/api/order/place-order`, {
                   CardItems,
                   totalAmount: TotalAmount + deliveryfees,
                   deliveryAddress: address,
@@ -135,7 +136,7 @@ const CheckOut = () => {
                         console.log("response ",response);
                         try {
                               const result = await axios.post(
-                                    'http://localhost:8000/api/order/verify-payment',
+                                    `${url}/api/order/verify-payment`,
                                     {
                                           orderId,
                                           razorpay_payment_id: response.razorpay_payment_id,

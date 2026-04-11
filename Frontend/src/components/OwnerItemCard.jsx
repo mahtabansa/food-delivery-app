@@ -9,11 +9,12 @@ import axios from 'axios';
 
 // data is comming from ownerDashboard.jsx as prop
 const OwnerItemCard = ({ data }) => {
+        const url = import.meta.env.VITE_SERVER_URL;
     const navigate = useNavigate();
     const dispatch = useDispatch();
     
     const deleteHandle = async()=> {
-      const result =   axios.get(`http://localhost:8000/api/item/delete-item/${data._id}`,{withCredentials:true});
+      const result =   axios.get(`${url}/api/item/delete-item/${data._id}`,{withCredentials:true});
 
       console.log(result);
 

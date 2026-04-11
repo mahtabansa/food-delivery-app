@@ -15,7 +15,7 @@ import { setSearchItem } from '../Redux/userSlice.js';
 
 function Navbar() {
       const { userData, currentCity, CardItems } = useSelector(state => state.user);
-
+      const url = import.meta.env.VITE_SERVER_URL;
       const { myShopData } = useSelector(state => state.owner);
       const [showInfo, setShowInfo] = useState(false);
       const [showSearch, setShowSearch] = useState(false);
@@ -27,7 +27,8 @@ function Navbar() {
 
 
       const handlelogout = async () => {
-            const user = await axios.post('http://localhost:8000/api/auth/signout', { withCredentials: true });
+            
+            const user = await axios.post(`${url}/api/auth/signout`, { withCredentials: true });
             console.log("logout response", user);
             dispatch(setUserData(null));
             dispatch(setCurrentCity(null));
@@ -37,7 +38,7 @@ function Navbar() {
 
       const handleSearchitem = async () => {
             
-            const result = await axios.get(`http://localhost:8000/api/item/search-item?query=${query}&city=${currentCity}`, { withCredentials: true });
+            const result = await axios.get(`${url}/api/item/search-item?query=${query}&city=${currentCity}`, { withCredentials: true });
             console.log("result", result)
 
             dispatch(setSearchItem(result.data.searchResults))

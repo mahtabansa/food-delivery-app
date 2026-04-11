@@ -22,6 +22,7 @@ const EditItem = () => {
       const [category, setCategory] = useState("");
       const [foodType, setFoodType] = useState("");
       const [loading,setLoading] = useState(false)
+        const url = import.meta.env.VITE_SERVER_URL;
 
       const categories = [
             "Snacks",
@@ -64,7 +65,7 @@ const EditItem = () => {
                   }
 
                   const result = await axios.put(
-                        `http://localhost:8000/api/item/edit-item/${ItemId.itemId}`,
+                        `${url}/api/item/edit-item/${ItemId.itemId}`,
                         formData,
                         {
                               withCredentials: true  
@@ -81,7 +82,7 @@ const EditItem = () => {
    useEffect(()=>{
       const handleGetByItemId = async() => {
             try {
-            const item = await axios.get(`http://localhost:8000/api/item/get-by-id/${ItemId.itemId}`,{withCredentials:true});
+            const item = await axios.get(`${url}/api/item/get-by-id/${ItemId.itemId}`,{withCredentials:true});
             
                   setCurrentItem(item.data)
             

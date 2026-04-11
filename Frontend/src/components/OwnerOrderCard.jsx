@@ -6,11 +6,12 @@ import { useState } from 'react';
 
 const OwnerOrderCard = ({ data }) => {
   const [availableBoys, setAvailableBoys] = useState([]);
+     const url = import.meta.env.VITE_SERVER_URL;
   const dispatch = useDispatch();
   const handleupdateStatus = async (orderId, shopId, status) => {
     try {
       const result = await
-        axios.post(`http://localhost:8000/api/order/update-status/${orderId}/${shopId}`, { status }, { withCredentials: true });
+        axios.post(`${url}/api/order/update-status/${orderId}/${shopId}`, { status }, { withCredentials: true });
       console.log("results in the ownerDashBoard", result)
       dispatch(updateStatus({ orderId, shopId, status }))
 

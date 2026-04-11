@@ -6,13 +6,14 @@ import { useNavigate } from 'react-router-dom'
 
 const UserOrderCard = ({ data }) => {
   const navigate = useNavigate()
+   const url = import.meta.env.VITE_SERVER_URL;
   const [selectdRatig, setSelectedrating] = useState({});
   console.log("data in user order card", data)
 
   const handleStar = (itemId, rating) => {
     console.log('star', rating, itemId);
     try {
-      const item = axios.post('http://localhost:8000/api/item/rating', { rating, itemId }, { withCredentials: true });
+      const item = axios.post(`${url}/api/item/rating`, { rating, itemId }, { withCredentials: true });
       console.log("item", item);
       setSelectedrating(prev => ({ ...prev, [itemId]: rating }));
     } catch (err) {
