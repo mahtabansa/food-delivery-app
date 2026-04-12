@@ -19,8 +19,8 @@ import CheckOut from './pages/CheckOut.jsx';
 import OrderPlaced from './pages/OrderPlaced.jsx';
 import MyOrder from './components/MyOrder.jsx';
 import UseGetMyOrders from './Hooks/UseGetMyOrder.jsx';
-import { UseUpdateUserLocation } from './Hooks/UseUpdateUserLocation.jsx'
-import TrackOrderPage from './pages/TrackOrderPage.jsx';
+import { UseUpdateUserLocation } from './Hooks/UseUpdateUserLocation'
+import TrackOrderPage from './pages/TrackOrderPage';
 import Shop from './pages/Shop.jsx';
 import { useEffect } from 'react';
 import {socket} from './socket.js';
