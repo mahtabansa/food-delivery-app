@@ -49,7 +49,7 @@ export default function SignUp() {
 
     try {
       const response = await axios.post(
-        `${url}/api/auth/signup`,
+        `https://food-delivery-app-1-qeto.onrender.com/api/auth/signup`,
         { fullName, email, password, mobile, role },
         {
           headers: {
