@@ -26,7 +26,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [loader, setloader] = useState(false);
   const dispatch = useDispatch();
-        const url = import.meta.env.VITE_SERVER_URL;
+        const url = import.meta.env.VITE_SERVER_URL ;
 
 
   const handleSignIn = async (event) => {
@@ -38,7 +38,7 @@ export default function SignIn() {
     try {
       setloader(true);
 
-      const response = await axios.post(`${url}/api/auth/signin`,
+      const response = await axios.post(`https://food-delivery-app-1-qeto.onrender.com/api/auth/signin`,
         { email, password }, { withCredentials: true })
 
       if (response.data) {
